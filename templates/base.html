@@ -1,0 +1,24 @@
+<html>
+	<head>
+		<title>{% block pagetitle %}{% endblock %}</title>
+		<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.min.js"></script>
+            {% block extra_headers %} {% endblock %}
+	</head>
+	<body>
+		<div id="header">Tender Management</div>
+		<div id="nav">
+			<ul>
+				<li><a href="/questions/">Questions</a>
+				<li><a href="/docs/">Documents</a>
+			</ul>
+		</div>
+		<div id="content">
+			<div id="main">
+				<h1>{% block title %}{% endblock %}</h1>
+
+				{% block main %}{% endblock %}
+			</div>
+		</div>
+		<div id="footer">..:: E : P ::..</div>
+	</body>
+</html>
