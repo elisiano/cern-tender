@@ -21,8 +21,6 @@ def qtype(request):
             if form.cleaned_data['question_type']== "QuestionFromList":
                 uri += '/%d' % form.cleaned_data['qfl_size']
             return HttpResponseRedirect(uri)
-        else:
-            return HttpResponse("Form is not valid")
     else:
         form = forms.QuestionForm()
 
@@ -55,31 +53,24 @@ def qcreate(request, type_, qfl_size=0):
     _extra = {}
     _extra['qfl_size'] = qfl_size
     if request.method=="POST":
-        ### QuestionFromList must be treated differently
-        if type_ == 'QuestionFromList':
-            form = form(request.POST, extra=_extra)
-            answer_data={}
-            if form.is_valid():
+        form = form(request.POST, extra=_extra)
+        if form.is_valid():
+            ### QuestionFromList must be treated differently
+            if type_ == 'QuestionFromList':
+                answer_data={}
                 for i in range(1,qfl_size+1):
                     _ans = form.cleaned_data.pop('answer_%s' %i)
                     _ts = form.cleaned_data.pop('ts_%s' %i)
                     answer_data[_ans] = _ts
                 q = getattr(models, type_)(form.cleaned_data, answer_data=answer_data)
-                q.save()
-                return HttpResponse('<pre>' + q.to_json() + '</pre>')
-        ### Other forms
-        else:
-            form = form(request.POST)
-            if form.is_valid():
+            ### Other forms
+            else:
                 q = getattr(models, type_)(form.cleaned_data)
-                q.save()
-                return HttpResponse('<pre>' + q.to_json() + '</pre>')
+            q.save()
+            return HttpResponse('<pre>' + q.to_json() + '</pre>')
                 
     else:
-        if type_ == 'QuestionFromList':
-            form=form(extra=_extra)
-        else:
-            form=form()
+        form=form(extra=_extra)
         
     return render_to_response('questions/question_form.html',
                               {'form': form, 'extra_data': extra_data},

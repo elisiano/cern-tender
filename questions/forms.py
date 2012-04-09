@@ -9,22 +9,17 @@ class QuestionForm(forms.Form):
                 (x, x) for x in dir(models)
                     if (x.startswith('Question') and not x.endswith('Template')
             )))
-    qfl_size = forms.CharField(label="Size of the list (only for QuestionFromList)", max_length=5, initial="2")
+    qfl_size = forms.IntegerField(label="Size of the list (only for QuestionFromList)", min_value=0, initial=2)
     
-    def clean_qfl_size(self):
-        qfl_size = self.cleaned_data.get('qfl_size',0)
-        try:
-            qfl_size=int(qfl_size)
-
-        except Exception:            
-            forms.ValidationError("This field must be an integer")
-
-        if qfl_size < 0:
-            forms.ValidationError("This field must be a positive integer")
-
-        return qfl_size
         
-class QuestionFromListForm(DocumentForm):
+class QuestionFormBase(DocumentForm):
+
+    def __init__(self, *args, **kwargs):
+        if 'extra' in kwargs:
+            kwargs.pop('extra')
+        super(QuestionFormBase, self).__init__(*args, **kwargs)
+
+class QuestionFromListForm(QuestionFormBase):
     
     qfl_size = forms.IntegerField(required=False)
 
@@ -41,19 +36,19 @@ class QuestionFromListForm(DocumentForm):
            self.fields['ts_%s' % i] = forms.CharField(label='Tech Spec %s' %i)         
 
 
-class QuestionIntegerRangeForm(DocumentForm):
+class QuestionIntegerRangeForm(QuestionFormBase):
 
     class Meta:
         document = models.QuestionIntegerRange
 
 
-class QuestionFloatRangeForm(DocumentForm):
+class QuestionFloatRangeForm(QuestionFormBase):
 
     class Meta:
         document = models.QuestionFloatRange
 
 
-class QuestionFreeTextForm(DocumentForm):
+class QuestionFreeTextForm(QuestionFormBase):
 
     class Meta:
         document = models.QuestionFreeText
