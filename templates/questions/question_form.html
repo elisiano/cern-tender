@@ -10,22 +10,6 @@
 {% block main %}
 	<form id="question_form" action="{{ extra_data.action }}" method="POST">{% csrf_token %}
 		{{ form.as_p }}
-        <!--input type="hidden" name="question_type"  value="{{ extra_data.question_type }}" /-->
-        {% comment %}        
-        {% if extra_data.question_type == "QuestionFromList" %}
-        <div id="dictionary">
-            <div class="dict_pair">
-                <span class="dict_key"><label>key:</label><input type="text"  size="10"></span>
-                <span class="dict_value"><label>value:</label><input type="text" label="value" size="30"></span>
-            </div>
-            <div class="dict_pair">
-                <span class="dict_key"><label>key:</label><input type="text"  size="10"></span>
-                <span class="dict_value"><label>value:</label><input type="text" label="value" size="30"></span>
-            </div>
-            <input type="button" value="Add key/value pair">
-        </div>
-        {% endif %}
-        {% endcomment %}
 		<input type="submit" value="Submit" />
 	</form>
 {% endblock main %}
