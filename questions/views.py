@@ -9,6 +9,18 @@ from questions import models
 
 import couchdbkit
 
+
+### Utility function
+def message(title, message, pagetitle="Message"):
+    _message = { 'pagetitle':pagetitle,
+                 'title': title,
+                 'message':message}
+
+    return render_to_response(  'questions/message.html',
+                              { 'message':_message }
+                            )
+
+
 def list(request):
     db = couchdbkit.ext.django.loading.get_db('questions')
     # categories_count = db.view('questions/categories_count', group=True)
@@ -21,29 +33,37 @@ def list(request):
 
 def delete(request,qid):
     db = couchdbkit.ext.django.loading.get_db('questions')
+
     if not db.doc_exist(qid):
-        return HttpResponse("The indicated document (%s) doesn't exist" % qid)
+        return message('Error deleting document',
+                       "The indicated document (%s) doesn't exist" % qid,
+                        'Error'
+                       )
     result = db.delete_doc(qid)
     if(result['ok']):
-        return HttpResponse("Document %s Deleted" % qid)
+        return message('Document Deleted',
+                       'Document "%s" deleted successfully' % qid )
     else:
-        return HttpResponse("Something happened, please check document %s in the db" % qid)
+        return message('Unexpected Result',
+                       "Something happened, please check document %s in the db" % qid)
 
 
 def edit(request, qid):
     db = couchdbkit.ext.django.loading.get_db('questions')
+    message = {'pagetitle':'Error', 'title':'Error deleting document'}
     try:
         doc = db.get(qid)
     except couchdbkit.exceptions.ResourceNotFound:
-        return HttpResponse("The indicated document (%s) doesn't exist" % qid)
+        return message('Error editing document',
+                       "The indicated document (%s) doesn't exists" % qid)
 
 
-    action = "/questions/create/%s" % doc['doc_type']
+    action = "/questions/create/%s/" % doc['doc_type']
     form = getattr(forms,doc['doc_type'] + 'Form')
     if doc['doc_type'] == 'QuestionFromList':
-        _extra={}
+        _extra = dict()
         _extra['qfl_size'] = len(doc['answer_data'])
-        action +="/%s" % _extra['qfl_size']
+        action +="%s" % _extra['qfl_size']
 
         # the form will already receive doc['answer_data'] but here I will
         # structure it in a way that I can easily use in the form constructor
@@ -64,7 +84,9 @@ def clone(request, qid):
     try:
         doc = db.get(qid)
     except couchdbkit.exceptions.ResourceNotFound:
-        return HttpResponse("The indicated document (%s) doesn't exist" % qid)
+        return message('Error editing document',
+                       "The indicated document (%s) doesn't exists" % qid)
+
 
     del doc['_id']
     del doc['_rev']
@@ -98,7 +120,7 @@ def qcreate(request, type_, qfl_size=0):
 
     if type_ == 'QuestionFromList':
         if not qfl_size:
-            return HttpResponse("Invalid List Size")
+            return message("Error","Invalid List Size")
         try:
             qfl_size = int(qfl_size)
         except ValueError:
@@ -106,7 +128,7 @@ def qcreate(request, type_, qfl_size=0):
 
     form = getattr(forms, type_ + 'Form', None)
     if not form:
-        return HttpResponse('The specified form is invalid')
+        return message('Form Error','The specified form is invalid')
 
     extra_data={'question_type': type_}
 
@@ -126,7 +148,7 @@ def qcreate(request, type_, qfl_size=0):
         else:
             q = getattr(models, type_)(form.cleaned_data)
         q.save()
-        return HttpResponse('The Question "%s" has been saved' % q.question)
+        return message('Question Saved', 'The Question "%s" has been saved' % q.question)
 
 
     return render_to_response('questions/question_form.html',

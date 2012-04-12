@@ -8,7 +8,7 @@
         <div class="question {% cycle 'odd' 'even' %}" >
             <a href="/questions/edit/{{q.id}}">{{q.value.question}}</a>
             <a class="delete" href="/questions/delete/{{q.id}}">[Delete]</a>
-            <a class="duplicate" href="/questions/clone/{{q.id}}">[Clone]</a>
+            <a class="clone" href="/questions/clone/{{q.id}}">[Clone]</a>
         </div>
     {% endfor %}
 {% endblock main %}

@@ -1,7 +1,7 @@
 from django import forms
 from questions import models
 from couchdbkit.ext.django.forms import DocumentForm
-from couchdbkit.ext.django import schema
+#from couchdbkit.ext.django import schema
 
 class QuestionForm(forms.Form):
     question_type = forms.ChoiceField(
