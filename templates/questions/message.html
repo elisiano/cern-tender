@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block pagetitle %}{{ message.pagetitle }}{% endblock %}
+{% block title %}{{ message.title}}{% endblock %}
+
+
+{% block main %}
+	<div id="message">
+		{{ message.message }}
+	</div>
+        <br /> <br /> <br />
+{% endblock main %}

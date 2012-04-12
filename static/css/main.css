@@ -1,0 +1,41 @@
+body {
+	background: lightgrey;
+	font-family: Verdana;
+}
+#main {
+	padding: 50;
+	float: left;
+}
+
+.question {
+	width: 60%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.question.odd {
+	background: pink;
+}
+.question.even {
+	background: cyan;
+}
+
+.question > .delete {
+	background: yellow;
+	float: right;
+}
+.question > .clone {
+	background: lightgreen;
+	float: right;
+}
+
+#header {
+	font-size: +34;
+}
+#header, #footer, #main, #content, #nav {
+	float:	none;
+}
+
+#footer {
+	text-align: center;
+}
