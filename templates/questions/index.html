@@ -3,12 +3,21 @@
 {% block title %}List of Questions{% endblock %}
 
 {% block main %}
-	<div class="question subheader"> <a href="/questions/new/">Create a new question</a><br /><br /></div>
+    <div class="question subheader"> <a href="/questions/new/">Create a new question</a><br /><br /></div>
+
+    <div id="questions_accordion">
     {% for q in questions %}
-        <div class="question {% cycle 'odd' 'even' %}" >
-            <a href="/questions/edit/{{q.id}}">{{q.value.question}}</a>
-            <a class="delete" href="/questions/delete/{{q.id}}">[Delete]</a>
-            <a class="clone" href="/questions/clone/{{q.id}}">[Clone]</a>
-        </div>
+        {% ifchanged q.value.category %}
+        {% if not forloop.first %}</div><!-- not first -->{%endif%}
+        <h3><a href="#">{{q.value.category}}</a></h3>
+        <div>
+        {% endifchanged %}
+            <div class="question {% cycle 'odd' 'even' %}" >
+                <a href="/questions/edit/{{q.id}}">{{q.value.question}}</a>
+                <a class="delete" href="/questions/delete/{{q.id}}">[Delete]</a>
+                <a class="clone" href="/questions/clone/{{q.id}}">[Clone]</a>
+            </div>
+        {% if forloop.last %}</div>{% endif %}
     {% endfor %}
+    </div>
 {% endblock main %}

@@ -25,6 +25,8 @@ def list(request):
     db = couchdbkit.ext.django.loading.get_db('questions')
     # categories_count = db.view('questions/categories_count', group=True)
     questions = db.view('questions/by_category')
+    for k in questions:
+        print "k: ", k, "v: ",questions[k]
     return render_to_response(  'questions/index.html',
             { 'questions':questions },
             context_instance=RequestContext(request)

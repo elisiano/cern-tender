@@ -1,4 +1,6 @@
 $(document).ready(function() {
+
+	// Question Create tweaks
 	var mydom = $("#id_qfl_size").parent()
 
 	mydom.css("display","none");
@@ -11,4 +13,8 @@ $(document).ready(function() {
 			mydom.hide('fast');
 		}
 	})
+
+
+	// Quetion List tweaks
+	$('#questions_accordion').accordion({ header:'h3' });
 })
