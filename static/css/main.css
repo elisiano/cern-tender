@@ -1,5 +1,5 @@
 body {
-	background: lightgrey;
+	background: white;
 	font-family: Verdana;
 }
 #main {
@@ -8,20 +8,19 @@ body {
 }
 
 .question {
-	width: 60%;
+	width: 90%;
 	margin-left: auto;
 	margin-right: auto;
 }
 
 .question.odd {
-	background: pink;
+	background: lightblue;
 }
 .question.even {
-	background: cyan;
+	background: lightgrey;
 }
 
 .question > .delete {
-	background: yellow;
 	float: right;
 }
 .question > .clone {
