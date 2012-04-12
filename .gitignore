@@ -8,3 +8,7 @@ Thumbs.db
 # Python compiled objects #
 ###########################
 *.pyc
+
+# Other misc files #
+####################
+runserver.sh
