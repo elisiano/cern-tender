@@ -1,8 +1,9 @@
+{% load static %}
 <html>
 	<head>
 		<title>{% block pagetitle %}{% endblock %}</title>
-		<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.min.js"></script>
-		<link rel="stylesheet" href="{{ STATIC_URL }}css/main.css">
+		<script type="text/javascript" src="{% static "js/jquery.min.js" %}"></script>
+		<link rel="stylesheet" href="{% static "css/main.css" %}">
             {% block extra_headers %} {% endblock %}
 	</head>
 	<body>
