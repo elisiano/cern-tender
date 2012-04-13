@@ -13,7 +13,9 @@ $(document).ready(function() {
 			mydom.hide('fast');
 		}
 	})
-
+    // if the user reloads the page and QuestionFromList is selected,
+    // the size field is not displayed, si we explicitly trigger the change event
+    	$('#id_question_type').change();
 
 	// Quetion List tweaks
 	$('#questions_accordion').accordion({ header:'h3' });

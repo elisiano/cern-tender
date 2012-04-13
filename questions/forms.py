@@ -20,7 +20,7 @@ class QuestionForm(forms.Form):
                 (x, split_on_caps(x.replace("Question","",1))) for x in dir(models)
                     if (x.startswith('Question') and not x.endswith('Template')
             )))
-    qfl_size = forms.IntegerField(label="Size of the list (only for Question From List)", min_value=0, initial=2)
+    qfl_size = forms.IntegerField(label="Size of the list", min_value=0, initial=2)
 
 
 class QuestionFormBase(DocumentForm):

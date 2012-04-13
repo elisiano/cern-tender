@@ -1,6 +1,7 @@
 body {
-	background: white;
-	font-family: Verdana;
+    background: white;
+    font-family: Verdana;
+    margin-left: 50px;
 }
 #main {
 	padding: 50;
@@ -29,7 +30,8 @@ body {
 }
 
 #header {
-	font-size: +34;
+    font-size: 250%;
+    font-weight: bolder;
 }
 #header, #footer, #main, #content, #nav {
 	float:	none;
@@ -37,4 +39,32 @@ body {
 
 #footer {
 	text-align: center;
+}
+
+form {
+    border: 1px solid black;
+    padding: 50px;
+    -moz-border-radius: 20px;
+    -webkit-border-radius: 20px;
+    -khtml-border-radius: 20px;
+    border-radius: 20px;
+}
+#question_form {
+    background: lightblue;
+    width: 600px;
+}   float: left;
+
+ 
+#question_form > p > input {
+
+}
+
+
+#question_form > p > label {
+    margin-right: 25px;
+    text-align: right;
+    text-decoration: underline;
+    width: 200px;
+    display: block;
+    float: left;
 }
