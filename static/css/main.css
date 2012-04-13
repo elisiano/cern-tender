@@ -1,8 +1,9 @@
 body {
     background: white;
     font-family: Verdana;
-    margin-left: 50px;
+    margin: 50px;
 }
+
 #main {
 	padding: 50;
 	float: left;
@@ -52,9 +53,20 @@ form {
 #question_form {
     background: #E3F1FA;
     width: 600px;
-}   float: left;
-
+    float: left;
+}
  
+#message {
+    border: 1px solid black;
+    padding: 50px;
+    -moz-border-radius: 20px;
+    -webkit-border-radius: 20px;
+    -khtml-border-radius: 20px;
+    border-radius: 20px;
+    background: #E3F1FA;
+    float: left;
+}
+
 #question_form > p > input {
 
 }
