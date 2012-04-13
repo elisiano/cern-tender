@@ -50,7 +50,7 @@ form {
     border-radius: 20px;
 }
 #question_form {
-    background: lightblue;
+    background: #E3F1FA;
     width: 600px;
 }   float: left;
 
@@ -58,7 +58,6 @@ form {
 #question_form > p > input {
 
 }
-
 
 #question_form > p > label {
     margin-right: 25px;
