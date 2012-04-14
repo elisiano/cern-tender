@@ -38,11 +38,17 @@ class QuestionRangeTemplate(QuestionTemplate):
     ts_formatter = StringProperty()
 
     def __init__(self, *args, **kwargs):
+        print "args: ", args
+        print "kwargs: ", kwargs
+
         super(QuestionRangeTemplate, self).__init__(*args, **kwargs)
         if not self.tech_spec:
             self.tech_spec = "Dynamically generated during validation"
 
     def validate(self, **params):
+        print "QR: validate params", params
+        print "self.min_: ", self.min_
+        print "self.max_: ", self.max_
         super(QuestionRangeTemplate, self).validate(**params)
         if self.answer:
             if self.min_ <= self.answer <= self.max_:
@@ -64,7 +70,7 @@ class QuestionFloatRange(QuestionRangeTemplate):
     min_ = FloatProperty(required=True)
     max_ = FloatProperty(required=True)
     answer = FloatProperty()
-
+    
 
 class QuestionFreeText(QuestionTemplate):
         answer = StringProperty()  # not used?

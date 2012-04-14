@@ -8,6 +8,7 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 urlpatterns = patterns('',
     #url(r'^$', 'tender.views.home', name='home'),
     url(r'^questions/', include('questions.urls')),
+    url(r'^documents/', include('documents.urls')),
 )
 
 urlpatterns += staticfiles_urlpatterns()

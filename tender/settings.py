@@ -161,5 +161,5 @@ LOGGING = {
 
 COUCHDB_DATABASES = (
     ('tender.questions', 'http://procdev14.cern.ch:5985/questions'),
-    ('tender.documents', 'http://procdev14.cern.ch:5985/docs'),
+    ('tender.documents', 'http://procdev14.cern.ch:5985/documents'),
 )

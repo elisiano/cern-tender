@@ -10,15 +10,7 @@ from questions import models
 import couchdbkit
 
 
-### Utility function
-def message(title, message, pagetitle="Message"):
-    _message = { 'pagetitle':pagetitle,
-                 'title': title,
-                 'message':message}
-
-    return render_to_response(  'questions/message.html',
-                              { 'message':_message }
-                            )
+from tender.utils import message
 
 
 def list(request):
@@ -149,6 +141,7 @@ def qcreate(request, type_, qfl_size=0):
         ### Other forms
         else:
             q = getattr(models, type_)(form.cleaned_data)
+        #print "about to save the question:", q.to_json()
         q.save()
         return message('Question Saved', 'The Question "%s" has been saved' % q.question)
 

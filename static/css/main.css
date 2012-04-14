@@ -75,7 +75,7 @@ form {
     float: left;
 }
 
-#question_form > p {
+#question_form > p { 
     margin-top: 5px;
     width: 100%;
     float:left;

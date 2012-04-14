@@ -2,17 +2,8 @@ from django import forms
 from questions import models
 from couchdbkit.ext.django.forms import DocumentForm
 #from couchdbkit.ext.django import schema
-import re
 
-### Found on http://code.activestate.com/recipes/440698-split-string-on-capitalizeduppercase-char/
-def split_on_caps(str):
-    
-    rs = re.findall('[A-Z][^A-Z]*',str)
-    fs = ""
-    for word in rs:
-        fs += " "+word
-    
-    return fs
+from tender.utils import split_on_caps
 
 class QuestionForm(forms.Form):
     question_type = forms.ChoiceField(

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block pagetitle %}Documents Management{% endblock %}
+{% block title %}List of Documents{% endblock %}
+{% block extra_headers %}
+    <script type="text/javascript" src="{{ STATIC_URL }}js/documents.js"></script>
+{% endblock extra_headers %}
+
+
+{% block main %}
+    <div class="document subheader"> <a href="/documents/new/">Create a new document</a><br /><br /></div>
+
+    <div id="documents">
+        <ul>
+        {% for d in documents %}
+            <li> <a href="/documents/edit/{{d.id}}/">{{d.id}}</a></li>
+        {% empty %}
+            <li> No documents yet </li>
+        {% endfor %}
+        </ul>
+
+    </div>
+{% endblock main %}
