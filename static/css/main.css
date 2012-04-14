@@ -22,6 +22,31 @@ body {
     clear: both;
 }
 
+/*** uniform look & feel for all forms ***/
+form {
+    border: 1px solid black;
+    padding: 50px;
+    -moz-border-radius: 20px;
+    -webkit-border-radius: 20px;
+    -khtml-border-radius: 20px;
+    border-radius: 20px;
+    background: #E3F1FA;
+}
+
+input, select {
+    border: 1px solid black;
+    /* background: #9cf; */
+    background: #EEF7FC;
+    width: 350px;
+    margin: 3px;
+}
+
+input[type="submit"] {
+    background: #ccf;
+    height: 25px;
+}
+
+
 /*** This part styles the Question List ***/
 .question {
 	width: 90%;
@@ -60,17 +85,9 @@ body {
 }
 /*********************************/
 
+
 /**** This part styles the question form ****/
-form {
-    border: 1px solid black;
-    padding: 50px;
-    -moz-border-radius: 20px;
-    -webkit-border-radius: 20px;
-    -khtml-border-radius: 20px;
-    border-radius: 20px;
-}
 #question_form {
-    background: #E3F1FA;
     width: 600px;
     float: left;
 }
@@ -120,3 +137,8 @@ ul.errorlist+p {
 }
 
 /*******************************************************/
+
+/***************** Documents Part **********************/
+.dict.key {
+    font-weight: bold;
+}

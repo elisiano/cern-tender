@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% load static %}
+{% block extra_headers %}
+    <script type="text/javascript" src="{% static "js/documents.js" %}"></script>
+{% endblock extra_headers %}
+
+{% block pagetitle %}New Document{% endblock %}
+{% block title %}New Document{% endblock %}
+
+
+{% block main %}
+	<form id="document_form" action="{{ extra_data.action }}" method="POST">{% csrf_token %}
+		{{ form.as_p }}
+		<p> <label>&nbsp;</label><input type="submit" value="Submit" /> </p>
+	</form>
+{% endblock main %}

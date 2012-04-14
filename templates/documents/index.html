@@ -1,8 +1,9 @@
 {% extends "base.html" %}
+{% load static %}
 {% block pagetitle %}Documents Management{% endblock %}
 {% block title %}List of Documents{% endblock %}
 {% block extra_headers %}
-    <script type="text/javascript" src="{{ STATIC_URL }}js/documents.js"></script>
+    <script type="text/javascript" src="{% static "js/documents.js" %}"></script>
 {% endblock extra_headers %}
 
 
@@ -12,7 +13,7 @@
     <div id="documents">
         <ul>
         {% for d in documents %}
-            <li> <a href="/documents/edit/{{d.id}}/">{{d.id}}</a></li>
+            <li> <a href="/documents/view/{{d.id}}">{{d.id}}</a></li>
         {% empty %}
             <li> No documents yet </li>
         {% endfor %}

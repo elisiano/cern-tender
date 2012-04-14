@@ -1,6 +1,7 @@
 {% extends "base.html" %}
+{% load static %}
 {% block extra_headers %}
-    <script type="text/javascript" src="{{ STATIC_URL }}js/questions.js"></script>
+    <script type="text/javascript" src="{% static "js/questions.js" %}"></script>
 {% endblock extra_headers %}
 
 {% block pagetitle %}New Question{% endblock %}

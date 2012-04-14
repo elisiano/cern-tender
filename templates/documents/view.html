@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load static %}
+{% block extra_headers %}
+    <script type="text/javascript" src="{% static "js/documents.js" %}"></script>
+{% endblock extra_headers %}
+
+{% block pagetitle %}View Document{% endblock %}
+{% block title %}View Document{% endblock %}
+
+
+{% block main %}
+    <div id="document">
+    {% for k, v in doc.items %}
+        <div class="dict pair"><span class="dict key">{{k}}:</span><span class="dict value">{{v}}</span></div>
+    {% endfor %}
+        <a href="/documents/delete/{{doc.id}}">Delete This Document</a>
+    </div>    
+{% endblock main %}
