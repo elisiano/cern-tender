@@ -8,7 +8,21 @@ body {
 	padding: 50;
 	float: left;
 }
+#header {
+    font-size: 250%;
+    font-weight: bolder;
+}
+#header, #footer, #main, #content, #nav {
+	float:	none;
+}
 
+#footer {
+    margin-top: 100px;    
+    text-align: center;
+    clear: both;
+}
+
+/*** This part styles the Question List ***/
 .question {
 	width: 90%;
 	margin-left: auto;
@@ -30,18 +44,23 @@ body {
 	float: right;
 }
 
-#header {
-    font-size: 250%;
-    font-weight: bolder;
-}
-#header, #footer, #main, #content, #nav {
-	float:	none;
-}
+/********************************************/
 
-#footer {
-	text-align: center;
-}
 
+/********* Message page *********/ 
+#message {
+    border: 1px solid black;
+    padding: 50px;
+    -moz-border-radius: 20px;
+    -webkit-border-radius: 20px;
+    -khtml-border-radius: 20px;
+    border-radius: 20px;
+    background: #E3F1FA;
+    float: left;
+}
+/*********************************/
+
+/**** This part styles the question form ****/
 form {
     border: 1px solid black;
     padding: 50px;
@@ -55,20 +74,11 @@ form {
     width: 600px;
     float: left;
 }
- 
-#message {
-    border: 1px solid black;
-    padding: 50px;
-    -moz-border-radius: 20px;
-    -webkit-border-radius: 20px;
-    -khtml-border-radius: 20px;
-    border-radius: 20px;
-    background: #E3F1FA;
-    float: left;
-}
 
-#question_form > p > input {
-
+#question_form > p {
+    margin-top: 5px;
+    width: 100%;
+    float:left;
 }
 
 #question_form > p > label {
@@ -79,3 +89,34 @@ form {
     display: block;
     float: left;
 }
+
+#question_form > p > input, #question_form > p > select {
+    border: 1px solid black;
+    /* background: #9cf; */
+    background: #EEF7FC;
+    width: 350px;
+    float: right;
+    margin: 3px;
+}
+
+#question_form > p > input[type="submit"] {
+    background: #ccf;
+    height: 25px;
+}
+
+ul.errorlist+p {
+    border: 2px solid red;
+}
+
+/*** This hides the "This field is required" list item
+ *   must be confirmed with FPP 
+#question_form > ul.errorlist {
+    display:none
+}
+****/
+/* remove the underline from the empty label */
+#question_form > p:last-child > label {
+    text-decoration: none;
+}
+
+/*******************************************************/
