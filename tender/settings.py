@@ -128,6 +128,7 @@ INSTALLED_APPS = (
     # 'django.contrib.admindocs',
     'couchdbkit.ext.django',
     'questions',
+    'documents',
 )
 
 # A sample logging configuration. The only tangible logging

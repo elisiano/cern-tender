@@ -6,7 +6,8 @@
 
 {% block main %}
 	<div id="message">
+        {% autoescape off %}
 		{{ message.message }}
+        {% endautoescape %}
 	</div>
-        <br /> <br /> <br />
 {% endblock main %}

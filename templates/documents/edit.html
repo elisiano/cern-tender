@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% load static %}
+{% block extra_headers %}
+    <script type="text/javascript" src="{% static "js/documents.js" %}"></script>
+{% endblock extra_headers %}
+
+{% block pagetitle %}Edit Document{% endblock %}
+{% block title %}Edit Document {{extra_data.doc.id}}{% endblock %}
+
+
+{% block main %}
+	<form id="document_form" action="{{ extra_data.action }}" method="POST">{% csrf_token %}
+		{{ form.as_p }}
+            
+
+        <div id="systems" class="ui-widget">
+            <div class="ui-widget-header">Systems</div>
+            <ul class="ui-widget-content">   
+            {% for s in extra_data.doc.systems %}
+                <li class="ui-state-default">{{s.name}}<a class="ui-state-default system delete" href="{% url documents.views.delete_system forloop.counter0 extra_data.doc.id %}">Delete</a></li>
+            {% empty %}
+                <li class="ui-state-default">No System Defined</li>
+            {% endfor %}
+            </ul>
+        </div>        
+        <div class="document actions">
+            <a href="{% url documents.views.add_system extra_data.doc.id %}">Add System</a>
+        </div>
+		<p> <label>&nbsp;</label><input type="submit" value="Submit" /> </p>
+	</form>
+{% endblock main %}

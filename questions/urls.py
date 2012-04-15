@@ -6,5 +6,5 @@ urlpatterns = patterns('questions.views',
     url('^edit/([^/]+)', 'edit'),
     url('^delete/([^/]+)', 'delete'),
     url('^clone/([^/]+)', 'clone'),
-    url('^$', 'list'),
+    url('^$', 'index'),
 )

@@ -13,7 +13,7 @@ import couchdbkit
 from tender.utils import message
 
 
-def list(request):
+def index(request):
     db = couchdbkit.ext.django.loading.get_db('questions')
     # categories_count = db.view('questions/categories_count', group=True)
     questions = db.view('questions/by_category')

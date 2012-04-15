@@ -139,6 +139,43 @@ ul.errorlist+p {
 /*******************************************************/
 
 /***************** Documents Part **********************/
-.dict.key {
-    font-weight: bold;
+
+#document {
+    border: 1px solid black;
+    padding: 50px;
+    -moz-border-radius: 20px;
+    -webkit-border-radius: 20px;
+    -khtml-border-radius: 20px;
+    border-radius: 20px;
+    background: #E3F1FA;
+    float: left;
+    width: 900px;
+}
+#document > p {
+    clear: both;
+}
+
+#document > p > .document.label {
+        font-weight: bold;
+    text-align: right;
+    width: 200px;
+    display: block;
+    float: left;
+    margin-right: 25px
+}
+#document > p > textarea {
+    height: 300px;
+    background: #EEF7FC;
+    width: 660px;
+   
+}
+.document.actions {
+    clear: both;
+    text-align: center;
+    margin: 25px;
+    margin-top: 100px;
+}
+
+.system.delete {
+    float: right;
 }

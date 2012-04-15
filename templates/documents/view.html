@@ -4,15 +4,28 @@
     <script type="text/javascript" src="{% static "js/documents.js" %}"></script>
 {% endblock extra_headers %}
 
-{% block pagetitle %}View Document{% endblock %}
-{% block title %}View Document{% endblock %}
+{% block pagetitle %}View Document {{doc.id}}{% endblock %}
+{% block title %}View Document {{doc.id}}{% endblock %}
 
 
 {% block main %}
     <div id="document">
-    {% for k, v in doc.items %}
-        <div class="dict pair"><span class="dict key">{{k}}:</span><span class="dict value">{{v}}</span></div>
-    {% endfor %}
-        <a href="/documents/delete/{{doc.id}}">Delete This Document</a>
+        <p class="ui-widget"><span class="ui-widget-header document label">Document ID:</span><span id="id" class="ui-widget-content ui-state-default ui-corner-all document value">{{doc.id}}</span></p>
+        <p class="ui-widget"><span class="ui-widget-header document label">Revision:</span><span id="rev" class="ui-widget-content ui-state-default ui-corner-all document value">{{doc.rev}}</span></p>
+        <p class="ui-widget"><span class="ui-widget-header document label">Introduction:</span><textarea readonly id="intro" class="ui-widget-content ui-state-default ui-corner-all document value">{{doc.intro}}</textarea></p>
+        <div id="systems" class="ui-widget">
+            <div class="ui-widget-header">Systems</div>
+            <ul class="ui-widget-content">   
+            {% for s in doc.systems %}
+                <li class="ui-state-default">{{s.name}}</li>
+            {% empty %}
+                <li class="ui-state-default">No System Defined</li>
+            {% endfor %}
+            </ul>
+        </div>        
+        <div class='document actions'>
+            <a href="/documents/edit/{{doc.id}}">Edit This Document</a>
+            <a href="/documents/delete/{{doc.id}}">Delete This Document</a>
+        </div>
     </div>    
 {% endblock main %}
