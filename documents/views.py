@@ -2,7 +2,7 @@
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 import couchdbkit
 from documents import forms
 from tender.utils import message
@@ -61,7 +61,7 @@ def edit_document_root(request,doc_id):
     # just to make available the fields starting with underscore in the template
     doc['id'] = doc['_id']
     doc['rev'] = doc['_rev']
-    form = forms.EditDocumentRootForm(doc,auto_id=False) 
+
     if request.POST:
         form = forms.EditDocumentRootForm(request.POST,auto_id=False)
         
@@ -69,6 +69,16 @@ def edit_document_root(request,doc_id):
             del doc['id']
             del doc['rev']
             doc['intro'] = form.cleaned_data['intro']
+            # the systems must be reordered
+            print "cleaned_daa: ",form.cleaned_data
+            new_systems = []
+            for i in range(0,len(doc.get('systems',[]))):
+                for s in doc['systems']:
+                    if s['name'] == form.cleaned_data['system_%d' % i]:
+                        new_systems.append(s)
+                        break
+            doc['systems'] = new_systems
+            #return HttpResponse('Not saved yet')
             result = db.save_doc(doc)
             ahref = reverse('documents.views.view', args=(doc_id,))
             if result['ok']:
@@ -78,7 +88,11 @@ def edit_document_root(request,doc_id):
                 return message('Error',
                                'Error while updating document "%s"' % doc_id)
 
-
+    else:
+        data = doc        
+        for i in range(0,len(doc.get('systems',[]))):
+            data['system_%d' % i] = doc['systems'][i]['name']
+        form = forms.EditDocumentRootForm(data,auto_id=False) 
     #print doc
     return render_to_response('documents/edit.html', 
                               { 'form': form, 'extra_data': {'doc':doc or None} },

@@ -33,6 +33,17 @@ class NewDocumentForm(DocBaseForm):
 class EditDocumentRootForm(DocBaseForm):
     intro = forms.CharField(widget=forms.Textarea(attrs={'class':'ui-widget ui-corner-all','rows':30, 'cols':60}), 
                             label="Introduction", required=False)
+    systems_order = forms.CharField(widget=forms.HiddenInput(), required=False)
+    
+    def __init__(self, *args, **kwargs):
+        super(EditDocumentRootForm,self).__init__(*args, **kwargs)
+        doc =  db.get(args[0]['_id'])
+        systems = doc.get('systems',[])
+        print "args: ",args
+        for i in range(0,len(systems)):
+           self.fields['system_%d' % i] = forms.CharField(widget=forms.HiddenInput())
+        
+        #print "Edit Constructor: intro: ",args[0]['intro']
 
 class AddSystemForm(DocBaseForm):
     name = forms.CharField()

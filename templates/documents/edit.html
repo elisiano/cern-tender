@@ -17,7 +17,20 @@
             <div class="ui-widget-header">Systems</div>
             <ul class="ui-widget-content">   
             {% for s in extra_data.doc.systems %}
-                <li class="ui-state-default">{{s.name}}<a class="ui-state-default system delete" href="{% url documents.views.delete_system forloop.counter0 extra_data.doc.id %}">Delete</a></li>
+                <li class="ui-state-default">
+                    <span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
+                    <span class="ui-widget-content system name">{{s.name}}</span>
+                    <a class="ui-widget-content system edit" 
+                        href="{% url documents.views.edit_system forloop.counter0 extra_data.doc.id %}"
+                    >
+                        Edit
+                    </a>
+                    <a class="ui-widget-content system delete" 
+                        href="{% url documents.views.delete_system forloop.counter0 extra_data.doc.id %}"
+                    >
+                        Delete
+                    </a>
+                </li>
             {% empty %}
                 <li class="ui-state-default">No System Defined</li>
             {% endfor %}
