@@ -119,7 +119,7 @@ def add_system(request,doc_id):
                 return message('Error',
                                'Error adding system to "%s"' % doc_id)
     else:
-        form = forms.AddSystemForm(doc,auto_id=False)
+        form = forms.AddSystemForm(initial=doc,auto_id=False)
                                
     return render_to_response('documents/add_system.html',
                               {'form':form, 'extra_data':{'doc':doc or None}},
