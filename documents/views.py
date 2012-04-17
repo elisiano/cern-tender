@@ -135,10 +135,10 @@ def delete_system(request, index, doc_id):
         return message('Error',
                        'Error deleting system from "%s"' % doc_id)
 
-def edit_system(request, index, doc_id):
+def edit_system(request, system_idx, doc_id):
     doc = db.get(doc_id)
     doc['id']=doc['_id'] # used in the header of the tepmplate
-    system = doc['systems'][int(index)]
+    system = doc['systems'][int(system_idx)]
     
     
     if request.POST:
@@ -153,11 +153,48 @@ def edit_system(request, index, doc_id):
             system['section_%d' % section] = system['sections'][section]['header']
         form = forms.EditSystemForm(system,auto_id=False)
         
-    system['index']=int(index)
+    system['index']=int(system_idx)
     return render_to_response('documents/edit_system.html',
                               {'form': form, 'extra_data': {'system':system, 'doc': doc}},
                               context_instance=RequestContext(request))
                               
 
+def add_system_section(request,system_idx, doc_id):
+
+    doc = db.get(doc_id)
+    system = doc['systems'][int(system_idx)]
+    
+    if request.POST:
+        form_data = request.POST.copy()
+        form_data['system'] = system
+        form = forms.AddSystemSectionForm(form_data, auto_id=False)
+        if form.is_valid():
+            doc['systems'][int(system_idx)].setdefault('sections',[]).append(form.cleaned_data)
+            result = db.save_doc(doc)
+            if result['ok']:
+                return HttpResponseRedirect(reverse('documents.views.edit_system', args=(system_idx,doc_id)))
+            else:
+                return message('Error','Error adding a section to a system in "%s"' % doc_id)
+
+    else:
+        form_data = {'system': system}
+        form = forms.AddSystemSectionForm(initial=form_data, auto_id=False)
+    
+    doc['id'] = doc['_id']
+    return render_to_response('documents/add_system_section.html',
+                              {'form': form, 'extra_data': {'system':system, 'doc': doc}},
+                              context_instance=RequestContext(request))
+    
 def edit_system_section(request, section_idx, system_idx, doc_id):
+    return HttpResponse('Work in progress')
+        
+def delete_system_section(request, section_idx, system_idx, doc_id):
+    doc = db.get(doc_id)
+    del doc['systems'][int(system_idx)]['sections'][int(section_idx)]
+    result = db.save_doc(doc)
+    if result['ok']:
+        return HttpResponseRedirect(reverse('documents.views.edit_system', args=(system_idx,doc_id)))
+    else:
+        return message('Error','Error adding a section to a system in "%s"' % doc_id)
+
     return HttpResponse('Work in progress')

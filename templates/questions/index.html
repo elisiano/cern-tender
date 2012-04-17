@@ -22,6 +22,9 @@
                 <a class="clone" href="/questions/clone/{{q.id}}">[Clone]</a>
             </div>
         {% if forloop.last %}</div>{% endif %}
+    {% empty %}
+        <h3>No Question Defined</h3>
+        <div>At the moment there are no questions in the database</div>
     {% endfor %}
     </div>
 {% endblock main %}

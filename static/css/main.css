@@ -41,10 +41,11 @@ input, select {
     margin: 3px;
 }
 
+/*
 input[type="submit"] {
     background: #ccf;
     height: 25px;
-}
+}*/
 
 
 /*** This part styles the Question List ***/
@@ -116,6 +117,14 @@ input[type="submit"] {
     margin: 3px;
 }
 
+div > p > label {
+    margin-right: 25px;
+    text-align: right;
+    text-decoration: underline;
+    width: 200px;
+    display: block;
+    float: left;
+}
 #question_form > p > input[type="submit"] {
     background: #ccf;
     height: 25px;
@@ -161,7 +170,7 @@ ul.errorlist+p {
     width: 200px;
     display: block;
     float: left;
-    margin-right: 25px
+    margin-right: 25px;
 }
 #document > p > textarea {
     height: 300px;
@@ -183,18 +192,18 @@ a.system, a.section {
     float: right;
 }
 
-a.system.edit, a.system.delete, a.section.edit {
+a.system.edit, a.system.delete, a.section.edit, a.section.delete {
     position: relative;
     top: -1em;
+}
+
+a.system.delete, a.section.delete {
+    margin-right: 5px;
 }
 
 a.system.edit, a.section.edit {
     margin-left: 5px;
     margin-right: 20px;
-}
-
-a.system.delete {
-    margin-right: 5px;
 }
 
 span.system.name, span.section.name {
@@ -218,6 +227,14 @@ span.system.name, span.section.name {
 
 #systems > ul > li > span:first, #sections > ul > li > span:first{ 
     margin-left: -1.3em; 
+
+
+}
+.system.actions {
+    clear: both;
+    text-align: center;
+    margin: 25px;
+    margin-top: 100px;
 }
 /**************************/
 

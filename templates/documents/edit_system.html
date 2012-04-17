@@ -8,7 +8,7 @@
 {% block title %}Edit System in {{extra_data.doc.id}}{% endblock %}
 
 {% block main %}
-    <form id="edit_system" action="{{ extra_data.action }}" method="POST">
+    <form id="edit_system" action="{{ extra_data.action }}" method="POST">{% csrf_token %}
         {{ form.as_p }}
 
         <div id="sections">
@@ -24,6 +24,11 @@
                     >
                         Edit
                     </a>
+                    <a class="ui-widget-content section delete" 
+                        href="{% url documents.views.delete_system_section forloop.counter0 extra_data.system.index extra_data.doc.id %}"
+                    >
+                        Delete
+                    </a>
                 </li>
             {% empty %}
                 <li class="ui-state-default">No Section Defined</li>
@@ -31,7 +36,9 @@
             </ul>
             
         </div>
-
-        <p> <label>&nbsp;</label><input type="submit" value="Submit" /> </p>
+        <div class="ui-widget system actions">
+            <a class="ui-widget-content ui-state-default" href="{% url documents.views.add_system_section extra_data.system.index extra_data.doc.id %}">Add Section</a>
+        </div>
+        <p> <label>&nbsp;</label><input class="ui-widget-content ui-state-default" type="submit" value="Submit" /> </p>
     </form>
 {% endblock main %}

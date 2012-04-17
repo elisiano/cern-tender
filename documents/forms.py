@@ -78,3 +78,25 @@ class EditSystemForm(forms.Form):
                 yield(self.data[f])
         
 
+class AddSystemSectionForm(forms.Form):
+    header = forms.CharField(label="Section Header", help_text="Must be unique in the system")
+    description = forms.CharField(widget=forms.Textarea(),help_text="Optional", required=False)
+
+    
+    def __init__(self, *args, **kwargs):
+        super(AddSystemSectionForm, self).__init__(*args, **kwargs)
+        if 'system' in self.initial:
+            self.system = self.initial['system']
+        elif 'system' in self.data:
+            self.system = self.data['system']
+#        if self.system:
+#            for i in range(len(self.system.get('sections',[]))):
+#                self.fields['section_]
+        print self.system
+    
+    def clean_header(self):
+        for sec_idx in range(0,len(self.system.get('sections',[]))):
+            print self.system['sections'][sec_idx] 
+            if self.system['sections'][sec_idx]['header'] == self.cleaned_data['header']:
+                raise forms.ValidationError('There is another section with the same name')
+        return self.cleaned_data['header']
