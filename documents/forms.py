@@ -33,7 +33,6 @@ class NewDocumentForm(DocBaseForm):
 class EditDocumentRootForm(DocBaseForm):
     intro = forms.CharField(widget=forms.Textarea(attrs={'class':'ui-widget ui-corner-all','rows':30, 'cols':60}), 
                             label="Introduction", required=False)
-    systems_order = forms.CharField(widget=forms.HiddenInput(), required=False)
     
     def __init__(self, *args, **kwargs):
         super(EditDocumentRootForm,self).__init__(*args, **kwargs)
@@ -43,7 +42,6 @@ class EditDocumentRootForm(DocBaseForm):
         for i in range(0,len(systems)):
            self.fields['system_%d' % i] = forms.CharField(widget=forms.HiddenInput())
         
-        #print "Edit Constructor: intro: ",args[0]['intro']
 
 class AddSystemForm(DocBaseForm):
     name = forms.CharField()
@@ -60,4 +58,23 @@ class AddSystemForm(DocBaseForm):
                 raise forms.ValidationError('The system "%s" is already present in "%s"' % (data['name'],doc['_id']))
         return data['name']
 
+
+class EditSystemForm(forms.Form):
+    description = forms.CharField(widget=forms.Textarea(), required=False)
+    rules = forms.CharField(widget=forms.Textarea(), required=False)    
+
+    def __init__(self, *args, **kwargs):
+        super(EditSystemForm, self).__init__(*args, **kwargs)
+        system = args[0]
+        for section in range(0,len(system.get('sections',[]))):
+            self.fields['section_%d' % section] = forms.CharField(widget=forms.HiddenInput())
+            
+            
+    ### Iterator over fields starting with section_
+    def section_fields(self):
+        print self
+        for f in self.fields:
+            if f.startswith('section_'):
+                yield(self.data[f])
         
+

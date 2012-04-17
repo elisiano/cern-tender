@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load static %}
+{% block extra_headers %}
+    <script type="text/javascript" src="{% static "js/documents.js" %}"></script>
+{% endblock extra_headers %}
+
+{% block pagetitle %}Edit System{% endblock %}
+{% block title %}Edit System in {{extra_data.doc.id}}{% endblock %}
+
+{% block main %}
+    <form id="edit_system" action="{{ extra_data.action }}" method="POST">
+        {{ form.as_p }}
+
+        <div id="sections">
+        <div class="ui-widget-header">Sections</div>
+
+            <ul class="ui-widget-content sortable">
+            {% for section in form.section_fields %}
+                <li class="ui-state-default">
+                    <span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
+                    <span class="ui-widget-content section name">{{ section }}</span>
+                    <a class="ui-widget-content section edit" 
+                        href="{% url documents.views.edit_system_section forloop.counter0 extra_data.system.index extra_data.doc.id %}"
+                    >
+                        Edit
+                    </a>
+                </li>
+            {% empty %}
+                <li class="ui-state-default">No Section Defined</li>
+            {% endfor %}
+            </ul>
+            
+        </div>
+
+        <p> <label>&nbsp;</label><input type="submit" value="Submit" /> </p>
+    </form>
+{% endblock main %}

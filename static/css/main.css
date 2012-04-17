@@ -175,33 +175,20 @@ ul.errorlist+p {
     margin: 25px;
     margin-top: 100px;
 }
-/*
-#systems > ul > li {
-    margin-top: 1px;
-    margin-left: 1px;
-    padding-left: 15px;
 
-}
-#systems > ul > li > span.ui-icon{
-    margin: 0px;
-    position: relative;
-    top: 20px;
-    left: -15px;
-
-}
-*/
-a.system {
+/****** Systems Part ******/
+a.system, a.section {
     width: 75px;
     text-align: center;
     float: right;
 }
 
-a.system.edit, a.system.delete {
+a.system.edit, a.system.delete, a.section.edit {
     position: relative;
     top: -1em;
 }
 
-a.system.edit {
+a.system.edit, a.section.edit {
     margin-left: 5px;
     margin-right: 20px;
 }
@@ -210,7 +197,7 @@ a.system.delete {
     margin-right: 5px;
 }
 
-span.system.name {
+span.system.name, span.section.name {
     position: relative;
     top: -1.0em;
     margin-left: 1.5em;
@@ -222,13 +209,30 @@ span.system.name {
     margin: 0; 
     padding: 0; 
 }
-#systems > ul > li {
+#systems > ul > li, #sections > ul > li {
     margin: 0 3px 3px 3px; 
     padding: 0.4em; 
     padding-left: 0.5em; 
     height: 18px; 
 }
 
-#systems > ul > li > span:first{ 
+#systems > ul > li > span:first, #sections > ul > li > span:first{ 
     margin-left: -1.3em; 
 }
+/**************************/
+
+/**** Sections Part *****/
+#sections > ul {
+    list-style-type: none; 
+    margin: 0; 
+    padding: 0; 
+}
+#sections > ul > li {
+    margin: 0 3px 3px 3px; 
+    padding: 0.4em; 
+    padding-left: 0.5em; 
+    height: 18px; 
+}
+
+
+

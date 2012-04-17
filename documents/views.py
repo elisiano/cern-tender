@@ -133,4 +133,31 @@ def delete_system(request, index, doc_id):
         return HttpResponseRedirect(reverse('documents.views.edit_document_root', args=(doc_id,)))
     else:
         return message('Error',
-                       'Error adding system to "%s"' % doc_id)
+                       'Error deleting system from "%s"' % doc_id)
+
+def edit_system(request, index, doc_id):
+    doc = db.get(doc_id)
+    doc['id']=doc['_id'] # used in the header of the tepmplate
+    system = doc['systems'][int(index)]
+    
+    
+    if request.POST:
+        form = forms.EditSystemForm(request.POST,auto_id=False)
+        if form.is_valid():
+            print "Valid Form: ", form.cleaned_data
+            ### Must convert back the system structure
+            return HttpResponse('Form is Valid')
+
+    else:
+        for section in range(0,len(system.get('sections',[]))):
+            system['section_%d' % section] = system['sections'][section]['header']
+        form = forms.EditSystemForm(system,auto_id=False)
+        
+    system['index']=int(index)
+    return render_to_response('documents/edit_system.html',
+                              {'form': form, 'extra_data': {'system':system, 'doc': doc}},
+                              context_instance=RequestContext(request))
+                              
+
+def edit_system_section(request, section_idx, system_idx, doc_id):
+    return HttpResponse('Work in progress')
