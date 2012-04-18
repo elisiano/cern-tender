@@ -244,6 +244,33 @@ def delete_system_section(request, section_idx, system_idx, doc_id):
 
 ##### Document > System > Section > Questions
 def add_system_section_question(request, section_idx, system_idx, doc_id):
+    
+    if request.POST:
+        form = forms.AddSystemSectionQuestionForm(request.POST, auto_id=False)
+        if form.is_valid():
+            return HttpResponse('Form is valid: ', form.cleaned_data)
+    else:
+        question_db = couchdbkit.ext.django.loading.get_db('questions')
+        question_list = question_db.view('questions/by_category')
+        #current_category = ""
+        choices_dict = {}
+        for q in question_list:
+            v = q['value']
+            if not v['category'] in choices_dict:
+                choices_dict[v['category']]= [] 
+            choices_dict[v['category']].append((v['_id'], v['question']))
+            
+        _ = []
+        #print choices_dict
+        for k in choices_dict:
+            print k, "==>", tuple(choices_dict[k])
+            _.append((k,tuple(sorted(choices_dict[k], key=lambda x: x[1]))))
+        choices = tuple(_)
+        form = forms.AddSystemSectionQuestionForm({'choice':'','choices': choices},auto_id=False)
+    
+    return render_to_response('documents/add_system_section_question.html',
+                              {'form': form, 'extra_data': {}},
+                              context_instance=RequestContext(request))
     return HttpResponse('Work in progress')
 
 def edit_system_section_question(request, question_idx, section_idx, system_idx, doc_id):

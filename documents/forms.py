@@ -112,3 +112,13 @@ class EditSystemSectionForm(forms.Form):
         for f in self.fields:
             if f.startswith('question_'):
                 yield(self.data[f])
+                
+
+class AddSystemSectionQuestionForm(forms.Form):
+    choice = forms.CharField(widget=forms.Select())
+    
+    def __init__(self, *args, **kwargs):
+        super(AddSystemSectionQuestionForm, self).__init__(*args, **kwargs)
+        print args[0]['choices']
+        self.fields['choice'].widget.choices = args[0]['choices']
+    
