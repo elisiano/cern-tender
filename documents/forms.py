@@ -89,9 +89,10 @@ class AddSystemSectionForm(forms.Form):
             self.system = self.initial['system']
         elif 'system' in self.data:
             self.system = self.data['system']
-#        if self.system:
-#            for i in range(len(self.system.get('sections',[]))):
-#                self.fields['section_]
+        if self.system:
+            for i in range(len(self.system.get('sections',[]))):
+                self.fields['section_%d' % i] = forms.CharField(widget=forms.HiddenHinput())
+        
         print self.system
     
     def clean_header(self):

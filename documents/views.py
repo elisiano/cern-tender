@@ -10,6 +10,7 @@ from tender.utils import message
 
 db = couchdbkit.ext.django.loading.get_db('documents')
 
+
 def index(request):
     documents = db.all_docs()
     #for k in documents:
@@ -31,10 +32,10 @@ def new(request):
             return message('Error',
                            'Something went wrong while saving "%s"' % result['id'])
 
-    return render_to_response('documents/new_form.html', 
+    return render_to_response('documents/new_form.html',
                               { 'form': form, 'extra_data': {} },
                               context_instance=RequestContext(request))
-                              
+
 
 def view(request,_id):
     doc = db.get(_id)
@@ -42,7 +43,7 @@ def view(request,_id):
     doc['rev'] = doc['_rev']
     del doc['_id']
     del doc['_rev']
-    return render_to_response('documents/view.html', 
+    return render_to_response('documents/view.html',
                               { 'doc': doc, 'extra_data': {} })
 
 def delete(request,doc_id):
@@ -54,7 +55,7 @@ def delete(request,doc_id):
     else:
         return message('Error',
                        'Error while deleting document "%s"' % doc_id)
-                       
+
 def edit_document_root(request,doc_id):
 
     doc = db.get(doc_id)
@@ -64,13 +65,13 @@ def edit_document_root(request,doc_id):
 
     if request.POST:
         form = forms.EditDocumentRootForm(request.POST,auto_id=False)
-        
+
         if form.is_valid():
             del doc['id']
             del doc['rev']
             doc['intro'] = form.cleaned_data['intro']
             # the systems must be reordered
-            print "cleaned_daa: ",form.cleaned_data
+            print "cleaned_data: ",form.cleaned_data
             new_systems = []
             for i in range(0,len(doc.get('systems',[]))):
                 for s in doc['systems']:
@@ -89,15 +90,15 @@ def edit_document_root(request,doc_id):
                                'Error while updating document "%s"' % doc_id)
 
     else:
-        data = doc        
+        data = doc
         for i in range(0,len(doc.get('systems',[]))):
             data['system_%d' % i] = doc['systems'][i]['name']
-        form = forms.EditDocumentRootForm(data,auto_id=False) 
+        form = forms.EditDocumentRootForm(data,auto_id=False)
     #print doc
-    return render_to_response('documents/edit.html', 
+    return render_to_response('documents/edit.html',
                               { 'form': form, 'extra_data': {'doc':doc or None} },
                               context_instance=RequestContext(request))
-                  
+
 
 def add_system(request,doc_id):
     doc=db.get(doc_id)
@@ -111,7 +112,7 @@ def add_system(request,doc_id):
                 doc['systems'].append(form.cleaned_data)
             else:
                 doc['systems'] = [form.cleaned_data,]
-            
+
             result = db.save_doc(doc)
             if result['ok']:
                 return HttpResponseRedirect(reverse('documents.views.edit_document_root', args=(doc_id,)))
@@ -119,12 +120,14 @@ def add_system(request,doc_id):
                 return message('Error',
                                'Error adding system to "%s"' % doc_id)
     else:
+
         form = forms.AddSystemForm(initial=doc,auto_id=False)
-                               
+
+    doc['id'] = doc['_id']
     return render_to_response('documents/add_system.html',
                               {'form':form, 'extra_data':{'doc':doc or None}},
                               context_instance=RequestContext(request))
-                              
+
 def delete_system(request, index, doc_id):
     doc=db.get(doc_id)
     del doc['systems'][int(index)]
@@ -139,31 +142,43 @@ def edit_system(request, system_idx, doc_id):
     doc = db.get(doc_id)
     doc['id']=doc['_id'] # used in the header of the tepmplate
     system = doc['systems'][int(system_idx)]
-    
-    
+
+
     if request.POST:
         form = forms.EditSystemForm(request.POST,auto_id=False)
         if form.is_valid():
             print "Valid Form: ", form.cleaned_data
             ### Must convert back the system structure
-            return HttpResponse('Form is Valid')
+            new_sections=[]
+            for section_idx in range(len(system.get('sections',[]))):
+                for section in system['sections']:
+                    if section['header'] == form.cleaned_data['section_%d' % section_idx]:
+                        new_sections.append(section)
+                        break
+            doc['systems'][int(system_idx)]['sections'] = new_sections
+            result = db.save_doc(doc)
+            if result['ok']:
+                return HttpResponseRedirect(reverse('documents.views.edit_document_root', args=(doc_id,)))
+            else:
+                return message('Error',
+                               'Error editing system from "%s"' % doc_id)
 
     else:
         for section in range(0,len(system.get('sections',[]))):
             system['section_%d' % section] = system['sections'][section]['header']
         form = forms.EditSystemForm(system,auto_id=False)
-        
+
     system['index']=int(system_idx)
     return render_to_response('documents/edit_system.html',
                               {'form': form, 'extra_data': {'system':system, 'doc': doc}},
                               context_instance=RequestContext(request))
-                              
+
 
 def add_system_section(request,system_idx, doc_id):
 
     doc = db.get(doc_id)
     system = doc['systems'][int(system_idx)]
-    
+
     if request.POST:
         form_data = request.POST.copy()
         form_data['system'] = system
@@ -179,15 +194,15 @@ def add_system_section(request,system_idx, doc_id):
     else:
         form_data = {'system': system}
         form = forms.AddSystemSectionForm(initial=form_data, auto_id=False)
-    
+
     doc['id'] = doc['_id']
     return render_to_response('documents/add_system_section.html',
                               {'form': form, 'extra_data': {'system':system, 'doc': doc}},
                               context_instance=RequestContext(request))
-    
+
 def edit_system_section(request, section_idx, system_idx, doc_id):
     return HttpResponse('Work in progress')
-        
+
 def delete_system_section(request, section_idx, system_idx, doc_id):
     doc = db.get(doc_id)
     del doc['systems'][int(system_idx)]['sections'][int(section_idx)]
