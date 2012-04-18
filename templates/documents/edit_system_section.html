@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load static %}
+{% block extra_headers %}
+    <script type="text/javascript" src="{% static "js/documents.js" %}"></script>
+{% endblock extra_headers %}
+
+{% block pagetitle %}Edit Section{% endblock %}
+{% block title %}Edit Section "{{extra_data.section.header }}"{% endblock %}
+
+{% block main %}
+    <form id="edit_section" action="{{ extra_data.action }}" method="POST">{% csrf_token %}
+            {{form.as_p}}
+        <div id='questions'>
+        <div class="ui-widget-header">Questions</div>
+
+            <ul class="ui-widget-content sortable">
+            {% for question in form.question_fields %}
+                <li class="ui-state-default">
+                    <span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
+                    <span class="ui-widget-content question name">{{ question }}</span>
+                    <a class="ui-widget-content question edit"
+                        href="{% url documents.views.edit_system_section_question forloop.counter0 extra_data.section.index extra_data.system.index extra_data.doc.id %}"
+                    >
+                        Edit
+                    </a>
+                    <a class="ui-widget-content question delete"
+                        href="{% url documents.views.delete_system_section_question forloop.counter0 extra_data.section.index extra_data.system.index extra_data.doc.id %}"
+                    >
+                        Delete
+                    </a>
+                </li>
+            {% empty %}
+                <li class="ui-state-default">No Question Defined</li>
+            {% endfor %}
+            </ul>
+
+        </div>
+
+        <div class="ui-widget question actions">
+            <a class="ui-widget-content ui-state-default" href="{% url documents.views.add_system_section_question extra_data.section.index extra_data.system.index extra_data.doc.id %}">Add Question</a>
+        </div>
+        <p> <label>&nbsp;</label><input class="ui-widget-content ui-state-default" type="submit" value="Submit" /> </p>
+    </form>
+{% endblock main%}

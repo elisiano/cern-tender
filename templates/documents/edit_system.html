@@ -19,12 +19,12 @@
                 <li class="ui-state-default">
                     <span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
                     <span class="ui-widget-content section name">{{ section }}</span>
-                    <a class="ui-widget-content section edit" 
+                    <a class="ui-widget-content section edit"
                         href="{% url documents.views.edit_system_section forloop.counter0 extra_data.system.index extra_data.doc.id %}"
                     >
                         Edit
                     </a>
-                    <a class="ui-widget-content section delete" 
+                    <a class="ui-widget-content section delete"
                         href="{% url documents.views.delete_system_section forloop.counter0 extra_data.system.index extra_data.doc.id %}"
                     >
                         Delete
@@ -34,7 +34,7 @@
                 <li class="ui-state-default">No Section Defined</li>
             {% endfor %}
             </ul>
-            
+
         </div>
         <div class="ui-widget system actions">
             <a class="ui-widget-content ui-state-default" href="{% url documents.views.add_system_section extra_data.system.index extra_data.doc.id %}">Add Section</a>

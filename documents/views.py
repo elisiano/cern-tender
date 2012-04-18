@@ -11,6 +11,9 @@ from tender.utils import message
 db = couchdbkit.ext.django.loading.get_db('documents')
 
 
+
+##### Documents
+
 def index(request):
     documents = db.all_docs()
     #for k in documents:
@@ -99,7 +102,7 @@ def edit_document_root(request,doc_id):
                               { 'form': form, 'extra_data': {'doc':doc or None} },
                               context_instance=RequestContext(request))
 
-
+##### Document > Systems
 def add_system(request,doc_id):
     doc=db.get(doc_id)
     if request.POST:
@@ -148,11 +151,12 @@ def edit_system(request, system_idx, doc_id):
         form = forms.EditSystemForm(request.POST,auto_id=False)
         if form.is_valid():
             print "Valid Form: ", form.cleaned_data
+            print "Form data:",form.data
             ### Must convert back the system structure
             new_sections=[]
             for section_idx in range(len(system.get('sections',[]))):
                 for section in system['sections']:
-                    if section['header'] == form.cleaned_data['section_%d' % section_idx]:
+                    if section['header'] == form.data['section_%d' % section_idx]:
                         new_sections.append(section)
                         break
             doc['systems'][int(system_idx)]['sections'] = new_sections
@@ -164,7 +168,7 @@ def edit_system(request, system_idx, doc_id):
                                'Error editing system from "%s"' % doc_id)
 
     else:
-        for section in range(0,len(system.get('sections',[]))):
+        for section in range(len(system.get('sections',[]))):
             system['section_%d' % section] = system['sections'][section]['header']
         form = forms.EditSystemForm(system,auto_id=False)
 
@@ -173,7 +177,7 @@ def edit_system(request, system_idx, doc_id):
                               {'form': form, 'extra_data': {'system':system, 'doc': doc}},
                               context_instance=RequestContext(request))
 
-
+##### Document > System > Sections
 def add_system_section(request,system_idx, doc_id):
 
     doc = db.get(doc_id)
@@ -201,7 +205,32 @@ def add_system_section(request,system_idx, doc_id):
                               context_instance=RequestContext(request))
 
 def edit_system_section(request, section_idx, system_idx, doc_id):
-    return HttpResponse('Work in progress')
+    doc = db.get(doc_id)
+    section=doc['systems'][int(system_idx)]['sections'][int(section_idx)]
+
+    if request.POST:
+        form = forms.EditSystemSectionForm(request.POST,auto_id=False)
+        if form.is_valid():
+            print "form cleaned", form.cleaned_data
+            print "form data", form.data
+            return HttpResponse('Form is valid')
+
+    else:
+        for i in range(len(section.get('questions',[]))):
+            section['question_%d' % i] = section['questions'][i]['question']
+
+        form = forms.EditSystemSectionForm(section, auto_id=False)
+
+    doc['id'] = doc['_id']
+    section['index'] = int(section_idx)
+    return render_to_response('documents/edit_system_section.html',
+                              {'form': form,
+                               'extra_data':
+                                   {'section':section,
+                                    'system': { 'index': int(system_idx) },
+                                    'doc': doc}
+                               },
+                              context_instance=RequestContext(request))
 
 def delete_system_section(request, section_idx, system_idx, doc_id):
     doc = db.get(doc_id)
@@ -212,4 +241,13 @@ def delete_system_section(request, section_idx, system_idx, doc_id):
     else:
         return message('Error','Error adding a section to a system in "%s"' % doc_id)
 
+
+##### Document > System > Section > Questions
+def add_system_section_question(request, section_idx, system_idx, doc_id):
+    return HttpResponse('Work in progress')
+
+def edit_system_section_question(request, question_idx, section_idx, system_idx, doc_id):
+    return HttpResponse('Work in progress')
+
+def delete_system_section_question(request, question_idx, section_idx, system_idx, doc_id):
     return HttpResponse('Work in progress')
