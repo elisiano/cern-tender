@@ -213,7 +213,7 @@ def edit_system_section(request, section_idx, system_idx, doc_id):
         if form.is_valid():
             print "form cleaned", form.cleaned_data
             print "form data", form.data
-            return HttpResponse('Form is valid')
+            return HttpResponse('Form is valid: reordering to be done')
 
     else:
         for i in range(len(section.get('questions',[]))):
@@ -244,30 +244,40 @@ def delete_system_section(request, section_idx, system_idx, doc_id):
 
 ##### Document > System > Section > Questions
 def add_system_section_question(request, section_idx, system_idx, doc_id):
-    
+    questions_db = couchdbkit.ext.django.loading.get_db('questions')
     if request.POST:
         form = forms.AddSystemSectionQuestionForm(request.POST, auto_id=False)
         if form.is_valid():
-            return HttpResponse('Form is valid: ', form.cleaned_data)
+            print "Add Question Form:",form.cleaned_data
+            # The form is clean, at this point we retrieve the question from
+            # the catalog and we remove the extra bits
+            q = questions_db.get(form.cleaned_data['choice'])
+            del q['_id']
+            del q['_rev']
+            doc = db.get(doc_id)
+            doc['systems'][int(system_idx)]['sections'][int(section_idx)].setdefault('questions',[]).append(q)
+            result = db.save_doc(doc)
+            if result['ok']:
+                return HttpResponseRedirect(reverse('documents.views.edit_system_section', args=(section_idx,system_idx,doc_id)))
+            else:
+                return message('Error','Error adding the selected question to "%s"' % doc_id)
     else:
-        question_db = couchdbkit.ext.django.loading.get_db('questions')
-        question_list = question_db.view('questions/by_category')
-        #current_category = ""
+        question_list = questions_db.view('questions/by_category')
         choices_dict = {}
         for q in question_list:
             v = q['value']
             if not v['category'] in choices_dict:
-                choices_dict[v['category']]= [] 
+                choices_dict[v['category']]= []
             choices_dict[v['category']].append((v['_id'], v['question']))
-            
+
         _ = []
         #print choices_dict
         for k in choices_dict:
-            print k, "==>", tuple(choices_dict[k])
+            #print k, "==>", tuple(choices_dict[k])
             _.append((k,tuple(sorted(choices_dict[k], key=lambda x: x[1]))))
         choices = tuple(_)
         form = forms.AddSystemSectionQuestionForm({'choice':'','choices': choices},auto_id=False)
-    
+
     return render_to_response('documents/add_system_section_question.html',
                               {'form': form, 'extra_data': {}},
                               context_instance=RequestContext(request))
