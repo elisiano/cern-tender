@@ -186,7 +186,7 @@ ul.errorlist+p {
 }
 
 /****** Systems Part ******/
-a.system, a.section {
+a.system, a.section, a.question {
     width: 75px;
     text-align: center;
     float: right;
@@ -197,16 +197,16 @@ a.system.edit, a.system.delete, a.section.edit, a.section.delete, a.question.edi
     top: -1em;
 }
 
-a.system.delete, a.section.delete {
+a.system.delete, a.section.delete, a.question.delete {
     margin-right: 5px;
 }
 
-a.system.edit, a.section.edit {
+a.system.edit, a.section.edit, a.question.edit {
     margin-left: 5px;
     margin-right: 20px;
 }
 
-span.system.name, span.section.name {
+span.system.name, span.section.name, span.question.name {
     position: relative;
     top: -1.0em;
     margin-left: 1.5em;

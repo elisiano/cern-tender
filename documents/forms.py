@@ -119,5 +119,23 @@ class AddSystemSectionQuestionForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super(AddSystemSectionQuestionForm, self).__init__(*args, **kwargs)
-        if args[0].get('choices'):
+        if kwargs.get('initial'):
+            self.fields['choice'].widget.choices = kwargs['initial'].get('choices',[])
+            self.section_questions = kwargs['initial'].get('section_questions',[])    
+        else:
             self.fields['choice'].widget.choices = args[0]['choices']
+            self.section_questions = args[0].get('section_questions',[])    
+        
+        print "Form SQ",self.section_questions
+        
+    def clean_choice(self):
+        choice = self.cleaned_data['choice'][3:-2]
+        print "CleanedData", self.cleaned_data
+        print "ValidatingChoiche:", choice
+        dbq = couchdbkit.ext.django.loading.get_db('questions')
+        qdoc = dbq.get(choice)
+        print "QDoc:",qdoc['question']
+        for q in self.section_questions:
+            if q == qdoc['question']:
+                raise forms.ValidationError('Question already present in the section')
+        return choice

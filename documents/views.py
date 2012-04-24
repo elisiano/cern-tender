@@ -245,8 +245,35 @@ def delete_system_section(request, section_idx, system_idx, doc_id):
 ##### Document > System > Section > Questions
 def add_system_section_question(request, section_idx, system_idx, doc_id):
     questions_db = couchdbkit.ext.django.loading.get_db('questions')
+    sys = int(system_idx)
+    sec = int(section_idx)
+    section_questions = [q['question'] for q in db.get(doc_id)['systems'][sys]['sections'][sec].get('questions',[])]
+    print "Section Questions:",section_questions
+    print "ASSQ POST:", request.POST
+
+
+    question_list = questions_db.view('questions/by_category')
+    choices_dict = {}
+    for q in question_list:
+        v = q['value']
+        if not v['category'] in choices_dict:
+            choices_dict[v['category']]= []
+        choices_dict[v['category']].append((v['_id'], v['question']))
+
+    _ = []
+    #print choices_dict
+    for k in choices_dict:
+        #print k, "==>", tuple(choices_dict[k])
+        _.append((k,tuple(sorted(choices_dict[k], key=lambda x: x[1]))))
+    choices = tuple(_)
+    data = {}
+    data['section_questions'] = section_questions
+    data['choices'] = choices
+    
     if request.POST:
-        form = forms.AddSystemSectionQuestionForm(request.POST, auto_id=False)
+        data.update(request.POST.copy())
+
+        form = forms.AddSystemSectionQuestionForm(data, auto_id=False)
         if form.is_valid():
             print "Add Question Form:",form.cleaned_data
             # The form is clean, at this point we retrieve the question from
@@ -255,36 +282,31 @@ def add_system_section_question(request, section_idx, system_idx, doc_id):
             del q['_id']
             del q['_rev']
             doc = db.get(doc_id)
-            doc['systems'][int(system_idx)]['sections'][int(section_idx)].setdefault('questions',[]).append(q)
+            doc['systems'][sys]['sections'][sec].setdefault('questions',[]).append(q)
             result = db.save_doc(doc)
             if result['ok']:
                 return HttpResponseRedirect(reverse('documents.views.edit_system_section', args=(section_idx,system_idx,doc_id)))
             else:
                 return message('Error','Error adding the selected question to "%s"' % doc_id)
     else:
-        question_list = questions_db.view('questions/by_category')
-        choices_dict = {}
-        for q in question_list:
-            v = q['value']
-            if not v['category'] in choices_dict:
-                choices_dict[v['category']]= []
-            choices_dict[v['category']].append((v['_id'], v['question']))
 
-        _ = []
-        #print choices_dict
-        for k in choices_dict:
-            #print k, "==>", tuple(choices_dict[k])
-            _.append((k,tuple(sorted(choices_dict[k], key=lambda x: x[1]))))
-        choices = tuple(_)
-        form = forms.AddSystemSectionQuestionForm({'choice':'','choices': choices},auto_id=False)
+        form = forms.AddSystemSectionQuestionForm(initial=data,auto_id=False)
 
     return render_to_response('documents/add_system_section_question.html',
                               {'form': form, 'extra_data': {}},
                               context_instance=RequestContext(request))
-    return HttpResponse('Work in progress')
 
 def edit_system_section_question(request, question_idx, section_idx, system_idx, doc_id):
     return HttpResponse('Work in progress')
 
 def delete_system_section_question(request, question_idx, section_idx, system_idx, doc_id):
-    return HttpResponse('Work in progress')
+    doc = db.get(doc_id)
+    sys = int(system_idx)
+    sec = int(section_idx)
+    del doc['systems'][sys]['sections'][sec]['questions'][int(question_idx)]
+    result = db.save_doc(doc)
+    if result['ok']:
+        return HttpResponseRedirect(reverse('documents.views.edit_system_section', args=(section_idx,system_idx,doc_id)))
+    else:
+        return message('Error','Error deleting the selected question from "%s"' % doc_id)
+
