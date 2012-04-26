@@ -40,8 +40,8 @@ def new(request):
                               context_instance=RequestContext(request))
 
 
-def view(request,_id):
-    doc = db.get(_id)
+def view(request,doc_id):
+    doc = db.get(doc_id)
     doc['id'] = doc['_id']
     doc['rev'] = doc['_rev']
     del doc['_id']

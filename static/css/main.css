@@ -55,18 +55,20 @@ input[type="submit"] {
 	margin-right: auto;
 }
 
+/* 
 .question.odd {
 	background: lightblue;
 }
 .question.even {
 	background: lightgrey;
 }
+*/
 
 .question > .delete {
 	float: right;
 }
 .question > .clone {
-	background: lightgreen;
+	/*background: lightgreen;*/
 	float: right;
 }
 

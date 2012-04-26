@@ -16,8 +16,22 @@
         <div id="systems" class="ui-widget">
             <div class="ui-widget-header">Systems</div>
             <ul class="ui-widget-content">   
-            {% for s in doc.systems %}
-                <li class="ui-state-default">{{s.name}}</li>
+            {% for sys in doc.systems %}
+                <li class="ui-state-default">{{sys.name}}</li>
+                <ul class="ui-widget-content">
+                {% for sec in sys.sections %}
+                    <li class="ui-state-default">{{sec.header}}</li>
+                    <ul class="ui-widget-content">
+                    {% for q in sec.questions %}
+                        <li class="ui-state-default">{{q.question}}</li>
+                    {% empty %}
+                        <li class="ui-state-default"><i>No Questions Defined</i></li>
+                    {% endfor %}
+                    </ul>
+                {% empty %}
+                    <li class="ui-state-default">No Sections Defined</li>
+                {% endfor %}
+                </ul>
             {% empty %}
                 <li class="ui-state-default">No System Defined</li>
             {% endfor %}

@@ -16,10 +16,10 @@
         <h3><a href="#">{{q.value.category}}</a></h3>
         <div>
         {% endifchanged %}
-            <div class="question {% cycle 'odd' 'even' %}" >
+            <div class="question {% cycle 'odd' 'even' %} ui-widget-content ui-state-default" >
                 <a href="/questions/edit/{{q.id}}">{{q.value.question}}</a>
-                <a class="delete" href="/questions/delete/{{q.id}}">[Delete]</a>
-                <a class="clone" href="/questions/clone/{{q.id}}">[Clone]</a>
+                <a class="delete ui-state-default" href="/questions/delete/{{q.id}}">[Delete]</a>
+                <a class="clone ui-state-default" href="/questions/clone/{{q.id}}">[Clone]</a>
             </div>
         {% if forloop.last %}</div>{% endif %}
     {% empty %}
