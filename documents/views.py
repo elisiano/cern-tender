@@ -206,13 +206,29 @@ def add_system_section(request,system_idx, doc_id):
 
 def edit_system_section(request, section_idx, system_idx, doc_id):
     doc = db.get(doc_id)
-    section=doc['systems'][int(system_idx)]['sections'][int(section_idx)]
+    sys=int(system_idx)
+    sec=int(section_idx)
+    section=doc['systems'][sys]['sections'][sec]
 
+    print "Section:", section
     if request.POST:
         form = forms.EditSystemSectionForm(request.POST,auto_id=False)
         if form.is_valid():
             print "form cleaned", form.cleaned_data
             print "form data", form.data
+            new_questions = []
+            for i in range(len(section.get('questions',[]))):
+                for q in section['questions']:
+                    if q['question'] == form.data['question_%d' % i]:
+                        new_questions.append(q)
+            doc['systems'][sys]['sections'][sec]['questions'] = new_questions
+            doc['systems'][sys]['sections'][sec]['description'] = form.cleaned_data['description']
+            
+            result = db.save_doc(doc)
+            if result['ok']:
+                return HttpResponseRedirect(reverse('documents.views.edit_system', args=(system_idx,doc_id)))
+            else:
+                return message('Error','Error saving section of a system in "%s"' % doc_id)
             return HttpResponse('Form is valid: reordering to be done')
 
     else:
