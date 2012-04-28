@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% load static %}
+{% block extra_headers %}
+    <script type="text/javascript" src="{% static "js/documents.js" %}"></script>
+{% endblock extra_headers %}
+
+{% block pagetitle %}Edit Question{% endblock %}
+{% block title %}Edit Question '{{question.question}}'{% endblock %}
+
+{% block main %}
+    <form id="edit_question" method="POST">
+        {{ form.as_p }}
+        <p> <label>&nbsp;</label><input type="submit" value="Submit" /> </p>
+{% endblock main %}
