@@ -81,7 +81,6 @@ class AddSystemSectionForm(forms.Form):
     header = forms.CharField(label="Section Header", help_text="Must be unique in the system")
     description = forms.CharField(widget=forms.Textarea(),help_text="Optional", required=False)
 
-
     def __init__(self, *args, **kwargs):
         super(AddSystemSectionForm, self).__init__(*args, **kwargs)
         if 'system' in self.initial:
@@ -140,8 +139,24 @@ class AddSystemSectionQuestionForm(forms.Form):
                 raise forms.ValidationError('Question already present in the section')
         return choice
 
+
 class EditSystemSectionQuestionForm(forms.Form):
-    question = forms.CharField(widget=forms.Textfield(attrs={'readonly': 'readonly'}))
-    answer = forms.CharField(requred=False)
+    question = forms.CharField(widget=forms.TextInput(attrs={'readonly': 'readonly'}))
+    answer = forms.CharField(required=False)
     category = forms.CharField()
     tag = forms.CharField()
+    doc_type = forms.CharField(widget=forms.HiddenInput())
+    tech_spec = forms.CharField(required=False)
+
+    def __init__(self, *args, **kwargs):
+        if self.get('initial'):
+            self.q_data = self.initial
+        else:
+            self.q_data = args[0]
+
+        if self.q_data['doc_type'].find('Range') > -1:
+            self.fields['min_'] = forms.CharField()
+            self.fields['max_'] = forms.CharField()
+#        elif self.q_data['doc_type'] == "QuestionFromList":
+#            a_data = self.q_data['answer_data']
+#            for k in a_data:

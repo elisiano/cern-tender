@@ -232,7 +232,6 @@ def edit_system_section(request, section_idx, system_idx, doc_id):
                 return HttpResponseRedirect(reverse('documents.views.edit_system', args=(system_idx, doc_id)))
             else:
                 return message('Error', 'Error saving section of a system in "%s"' % doc_id)
-            return HttpResponse('Form is valid: reordering to be done')
 
     else:
         for i in range(len(section.get('questions', []))):
@@ -328,7 +327,7 @@ def edit_system_section_question(request, question_idx, section_idx, system_idx,
     if request.POST:
         form = forms.EditSystemSectionQuestionForm(request.POST, auto_id=False)
         if form.is_valid():
-            print "Cleaned", form.cleane_data
+            print "Cleaned", form.cleaned_data
             print "Data", form.data
             return HttpResponse('Form is valid')
     else:
@@ -337,6 +336,7 @@ def edit_system_section_question(request, question_idx, section_idx, system_idx,
     return render_to_response('documents/edit_system_section_question.html',
                              {'form': form, 'question': question},
                                 context_instance=RequestContext(request))
+
 
 def delete_system_section_question(request, question_idx, section_idx, system_idx, doc_id):
     doc = db.get(doc_id)
