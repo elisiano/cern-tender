@@ -149,14 +149,20 @@ class EditSystemSectionQuestionForm(forms.Form):
     tech_spec = forms.CharField(required=False)
 
     def __init__(self, *args, **kwargs):
-        if self.get('initial'):
-            self.q_data = self.initial
-        else:
-            self.q_data = args[0]
+        super(EditSystemSectionQuestionForm, self).__init__(*args, **kwargs)
 
-        if self.q_data['doc_type'].find('Range') > -1:
-            self.fields['min_'] = forms.CharField()
-            self.fields['max_'] = forms.CharField()
-#        elif self.q_data['doc_type'] == "QuestionFromList":
-#            a_data = self.q_data['answer_data']
-#            for k in a_data:
+        data = args[0]
+        # Duck Typing: if some known fields are present they will be added to the form
+        ### First Case: QuestionFromList
+        i = 1
+        while data.get('answer_%d' % i, None):
+            self.fields['answer_%d' % i] = forms.CharField()
+            self.fields['tech_spec_%d' % i] = forms.CharField()
+            i+=1
+        ### For range types there are min_, max_ and ts_formatter
+        for f in [('min_', None), ('max_', None), ('ts_formatter', 'Tech Spec Formatter')]:
+            if data.get(f[0], None):
+                self.fields[f[0]] = forms.CharField(label=f[1])
+
+
+

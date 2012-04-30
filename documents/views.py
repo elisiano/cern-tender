@@ -329,9 +329,32 @@ def edit_system_section_question(request, question_idx, section_idx, system_idx,
         if form.is_valid():
             print "Cleaned", form.cleaned_data
             print "Data", form.data
-            return HttpResponse('Form is valid')
+            question = form.cleaned_data
+            if question['doc_type'] == 'QuestionFromList':
+                i = 1
+                while question.get('answer_%d' % i, None):
+                    print "converting attribute"
+                    question.setdefault('answer_data',{})[question['answer_%d' % i]] = question['tech_spec_%d' % i]
+                    del question['answer_%d' % i]
+                    del question['tech_spec_%d' % i]
+                    i+=1
+
+            print "New Question: ", question
+            doc['systems'][sys]['sections'][sec]['questions'][qid] = question
+            result = db.save_doc(doc)
+            if result['ok']:
+                return HttpResponseRedirect(reverse('documents.views.edit_system_section', args=(section_idx, system_idx, doc_id)))
+            else:
+                return message('Error', 'Error editing selected question in "%s"' % doc_id)
     else:
-        form = forms.EditSystemSectionQuestionForm(initial=question)
+
+        if question['doc_type'] == "QuestionFromList":
+            for _t in enumerate(question['answer_data'],1):
+                question['answer_%d' % _t[0]] = _t[1]
+                question['tech_spec_%d' % _t[0]] = question['answer_data'][_t[1]]
+            del question['answer_data']
+            print "Mangled Question:", question
+        form = forms.EditSystemSectionQuestionForm(question, auto_id=False)
 
     return render_to_response('documents/edit_system_section_question.html',
                              {'form': form, 'question': question},
