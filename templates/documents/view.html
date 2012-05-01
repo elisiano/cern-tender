@@ -15,7 +15,7 @@
         <p class="ui-widget"><span class="ui-widget-header document label">Introduction:</span><textarea readonly id="intro" class="ui-widget-content ui-state-default ui-corner-all document value">{{doc.intro}}</textarea></p>
         <div id="systems" class="ui-widget">
             <div class="ui-widget-header">Systems</div>
-            <ul class="ui-widget-content">   
+            <ul class="ui-widget-content">
             {% for sys in doc.systems %}
                 <li class="ui-state-default">{{sys.name}}</li>
                 <ul class="ui-widget-content">
@@ -36,10 +36,11 @@
                 <li class="ui-state-default">No System Defined</li>
             {% endfor %}
             </ul>
-        </div>        
+        </div>
         <div class='document actions'>
+            <a href="/questionnaire/{{doc.id}}">Questionnaire</a>
             <a href="/documents/edit/{{doc.id}}">Edit This Document</a>
             <a href="/documents/delete/{{doc.id}}">Delete This Document</a>
         </div>
-    </div>    
+    </div>
 {% endblock main %}

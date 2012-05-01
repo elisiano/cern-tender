@@ -129,6 +129,7 @@ INSTALLED_APPS = (
     'couchdbkit.ext.django',
     'questions',
     'documents',
+    'questionnaire',
 )
 
 # A sample logging configuration. The only tangible logging
