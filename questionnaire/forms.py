@@ -7,67 +7,6 @@ db = couchdbkit.ext.django.loading.get_db('documents')
 import pprint
 pp = pprint.PrettyPrinter(indent=4)
 
-#class BaseQuestionForm(forms.Form):
-#    doc_type = forms.CharField(widget=forms.HiddenInput())
-#    question = forms.CharField(widget=forms.HiddenInput())
-#    answer = forms.CharField()
-#
-#    def __init__(self, *args, **kwargs):
-#        super(BaseQuestionForm, self).__init__(*args, **kwargs)
-#        if kwargs.get('initial',None):
-#            self.q_data = kwargs['initial']
-#        else:
-#            self.q_data = args[0]
-#
-#        self.fields['answer'] = forms.CharField(label=self.q_data.get('question', None))
-#
-#    def clean_answer(self):
-#        QuestionModel = getattr(questions.models,self.q_data['doc_type'])
-#        self.q_data['answer'] = self.cleaned_data['answer']
-#        try:
-#            q = QuestionModel(self.q_data)
-#            q.validate()
-#        except Exception, e:
-#            raise forms.ValidationError('Error Validating Question: ', e)
-#
-#        return self.cleaned_data['answer']
-#
-#
-#class QuestionFromListForm(BaseQuestionForm):
-#
-#    def __init__(self, *args, **kwargs):
-#        super(QuestionFromListForm, self).__init__(*args, **kwargs)
-#        choices = tuple((k,k) for k in self.q_data['answer_data'])
-#        self.fields['answer'].widget = forms.CharField(widget=forms.Select(choices=choices))
-#
-#
-#
-#class BaseRangeQuestionForm(BaseQuestionForm):
-#
-#    def __init__(self, *args, **kwargs):
-#        super(BaseRangeQuestionForm, self).__init__(*args, **kwargs)
-#        self.fields['answer'].label += "[ min: %s, max: %s ]" % (self.q_data['min_'], self.q_data['max_'])
-#
-#class  QuestionIntegerRangeForm(BaseRangeQuestionForm):
-#    pass
-#
-#class QuestionFloatRangeForm(BaseRangeQuestionForm):
-#    pass
-#
-#class QuestionFreeTextForm(BaseQuestionForm):
-#    pass
-
-#class QSectionForm(forms.Form):
-#
-#    def __init__(self, *args, **kwargs):
-#        super(QSectionForm, self).__init__(*args, **kwargs)
-#        if kwargs.get('initial',None):
-#            self.s_data = kwargs['initial']
-#        else:
-#            self.s_data = args[0]
-#
-#        for i in range(len(self.s_data['questions'])):
-#            self.fields['question_%d' % i] = get_form_field(self.s_data['questions'][i])
 
 def get_form_field(question):
     label = question['question']
