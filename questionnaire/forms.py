@@ -47,6 +47,8 @@ class QSystemForm(forms.Form):
             print"bond self.s_data: ",
             pp.pprint(self.s_data)
 
+        print "Data: :",
+        pp.pprint(self.data)
         for sys in range(len(self.s_data.get('systems', []))):
             for sec in range(len(self.s_data['systems'][sys].get('sections', []))):
                 for q in range(len(self.s_data['systems'][sys]['sections'][sec].get('questions',[]))):

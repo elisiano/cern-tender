@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load static %}
+{% block extra_headers %}
+    <script type="text/javascript" src="{% static "js/documents.js" %}"></script>
+{% endblock extra_headers %}
+
+{% block pagetitle %}Validation Error {{doc.id}}{% endblock %}
+{% block title %}Validation Error {{doc.id}}{% endblock %}
+
+
+{% block main %}
+    <div id="document">
+        <p class="ui-widget"><span class="ui-widget-header document label">Document ID:</span><span id="id" class="ui-widget-content ui-state-default ui-corner-all document value">{{doc.id}}</span></p>
+        <p class="ui-widget"><span class="ui-widget-header document label">Revision:</span><span id="rev" class="ui-widget-content ui-state-default ui-corner-all document value">{{doc.rev}}</span></p>
+        <p class="ui-widget"><span class="ui-widget-header document label">Introduction:</span><textarea readonly id="intro" class="ui-widget-content ui-state-default ui-corner-all document value">{{doc.intro}}</textarea></p>
+        <div id="errors" class="ui-widget">
+            <div class="ui-widget-header">Errors</div>
+            <ul class="ui-widget-content">
+            {% for key, value in errors %}
+                <li class="ui-state-default">{{ key }}: <br> {{ value }}</li>
+            {% empty %}
+                <li class="ui-state-default">No Errors</li>
+            {% endfor %}
+            </ul>
+
+        </div>
+        <div class='document actions'>
+            <a href="/questionnaire/{{doc.id}}">Questionnaire</a>
+            <a href="/documents/edit/{{doc.id}}">Edit This Document</a>
+            <a href="/documents/delete/{{doc.id}}">Delete This Document</a>
+        </div>
+    </div>
+{% endblock main %}

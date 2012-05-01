@@ -59,6 +59,59 @@ def delete(request, doc_id):
                        'Error while deleting document "%s"' % doc_id)
 
 
+def valiate(request, doc_id):
+    doc = db.get(doc_id)
+    errors = {}
+    from questions import models
+    ### validating questions
+    for sys in range(len(doc.get('systems',[]))):
+        system = doc['systems'][sys]
+        for sec in range(len(system.get('sections',[]))):
+            section = system['sections'][sec]
+            for q in range(len(section.get('questions',[]))):
+                question = section['questions'][q]
+                try:
+                    qm = getattr(models, question['doc_type'])
+                except AttributeError:
+                    errors['%s > %s > %s' %
+                        (system['name'], section['header'], question['question'])
+                        ] = 'Question type %s not found' % question['doc_type']
+                else:
+                    try:
+                        _q = qm(question)
+                        _q.validate()
+                    except couchdbkit.exceptions.BadValueError, e:
+                        errors ['%s > %s > %s' %
+                        (system['name'], section['header'], question['question'])
+                        ] = "Bad Value: %s" % e
+                    except models.AnswerNotValid,e :
+                        errors ['%s > %s > %s' %
+                        (system['name'], section['header'], question['question'])
+                        ] = "Answer Not Valid: %s" % e
+                    else:
+                        ### Question looks valid, saving it in the doc
+                        del _q['_id']
+                        del _q['_rev']
+                        # question is a reference in the original doc
+                        question = _q
+    result = db.save_doc(doc)
+    if not result['ok']:
+        return message('Error',
+                       'Error Saving Document "%s" after valiation process' % doc_id)
+
+    if not errors:
+        ahref= reverse('documents.views.view', args=(doc_id,))
+        return message('Message Validated!',
+                       'Congratulations, <a href="%s">%s</a> passed validation!' % (ahref, doc_id))
+
+
+    doc['id'] = doc['_id']
+    doc['rev'] = doc['_rev']
+    return render_to_response('documents/valiate_errors.html',
+                              {'errors': errors, 'doc': doc},
+                              context_instance=RequestContext(request))
+    return HttpResponse('To Be Finished')
+
 def edit_document_root(request, doc_id):
 
     doc = db.get(doc_id)
