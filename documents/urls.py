@@ -16,5 +16,6 @@ urlpatterns = patterns('documents.views',
     url('^addsystemsectionquestion/(\d+)/(\d+)/(.*)', 'add_system_section_question'),
     url('^editsystemsectionquestion/(\d+)/(\d+)/(\d+)/(.*)', 'edit_system_section_question'),
     url('^deletesystemsectionquestion/(\d+)/(\d+)/(\d+)/(.*)', 'delete_system_section_question'),
+    url('^validate/(.*)', 'validate'),
     url('^$', 'index'),
 )
