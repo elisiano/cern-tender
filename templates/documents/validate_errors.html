@@ -12,11 +12,11 @@
     <div id="document">
         <p class="ui-widget"><span class="ui-widget-header document label">Document ID:</span><span id="id" class="ui-widget-content ui-state-default ui-corner-all document value">{{doc.id}}</span></p>
         <p class="ui-widget"><span class="ui-widget-header document label">Revision:</span><span id="rev" class="ui-widget-content ui-state-default ui-corner-all document value">{{doc.rev}}</span></p>
-        <p class="ui-widget"><span class="ui-widget-header document label">Introduction:</span><textarea readonly id="intro" class="ui-widget-content ui-state-default ui-corner-all document value">{{doc.intro}}</textarea></p>
         <div id="errors" class="ui-widget">
             <div class="ui-widget-header">Errors</div>
+            <!-- <pre> {{errors}} </pre>-->
             <ul class="ui-widget-content">
-            {% for key, value in errors %}
+            {% for key, value in errors.items %}
                 <li class="ui-state-default">{{ key }}: <br> {{ value }}</li>
             {% empty %}
                 <li class="ui-state-default">No Errors</li>

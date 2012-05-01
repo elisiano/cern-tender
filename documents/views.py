@@ -59,7 +59,7 @@ def delete(request, doc_id):
                        'Error while deleting document "%s"' % doc_id)
 
 
-def valiate(request, doc_id):
+def validate(request, doc_id):
     doc = db.get(doc_id)
     errors = {}
     from questions import models
@@ -90,10 +90,8 @@ def valiate(request, doc_id):
                         ] = "Answer Not Valid: %s" % e
                     else:
                         ### Question looks valid, saving it in the doc
-                        del _q['_id']
-                        del _q['_rev']
                         # question is a reference in the original doc
-                        question = _q
+                        question = dict(_q)
     result = db.save_doc(doc)
     if not result['ok']:
         return message('Error',
@@ -107,7 +105,7 @@ def valiate(request, doc_id):
 
     doc['id'] = doc['_id']
     doc['rev'] = doc['_rev']
-    return render_to_response('documents/valiate_errors.html',
+    return render_to_response('documents/validate_errors.html',
                               {'errors': errors, 'doc': doc},
                               context_instance=RequestContext(request))
     return HttpResponse('To Be Finished')
