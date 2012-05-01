@@ -55,7 +55,7 @@ input[type="submit"] {
 	margin-right: auto;
 }
 
-/* 
+/*
 .question.odd {
 	background: lightblue;
 }
@@ -270,4 +270,10 @@ span.system.name, span.section.name, span.question.name {
     text-align: center;
     margin: 25px;
     margin-top: 100px;
+}
+
+input[type="text"][readonly="readonly"] {
+    border-style: dotted ! important;
+    background: #E6EAED ! important;
+}
 }

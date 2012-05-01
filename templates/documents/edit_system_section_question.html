@@ -8,7 +8,8 @@
 {% block title %}Edit Question '{{question.question}}'{% endblock %}
 
 {% block main %}
-    <form id="edit_question" method="POST">{% csrf_token %}
+    <form id="question_form" method="POST">{% csrf_token %}
         {{ form.as_p }}
         <p> <label>&nbsp;</label><input type="submit" value="Submit" /> </p>
+    </form>
 {% endblock main %}

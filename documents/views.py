@@ -316,7 +316,6 @@ def add_system_section_question(request, section_idx, system_idx, doc_id):
 
 
 def edit_system_section_question(request, question_idx, section_idx, system_idx, doc_id):
-
     sys = int(system_idx)
     sec = int(section_idx)
     qid = int(question_idx)
@@ -325,7 +324,7 @@ def edit_system_section_question(request, question_idx, section_idx, system_idx,
     question = doc['systems'][sys]['sections'][sec]['questions'][qid]
 
     if request.POST:
-        form = forms.EditSystemSectionQuestionForm(request.POST, auto_id=False)
+        form = forms.EditSystemSectionQuestionForm(request.POST, auto_id=True)
         if form.is_valid():
             print "Cleaned", form.cleaned_data
             print "Data", form.data
@@ -354,7 +353,7 @@ def edit_system_section_question(request, question_idx, section_idx, system_idx,
                 question['tech_spec_%d' % _t[0]] = question['answer_data'][_t[1]]
             del question['answer_data']
             print "Mangled Question:", question
-        form = forms.EditSystemSectionQuestionForm(question, auto_id=False)
+        form = forms.EditSystemSectionQuestionForm(question, auto_id=True)
 
     return render_to_response('documents/edit_system_section_question.html',
                              {'form': form, 'question': question},
