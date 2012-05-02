@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 {% block extra_headers %}
-    <script type="text/javascript" src="{% static "js/questionnaire.js" %}"></script>
+    {# <script type="text/javascript" src="{% static "js/questionnaire.js" %}"></script> #}
 {% endblock extra_headers %}
 
 {% block pagetitle %}Questionnaire {{doc.id}}{% endblock %}
@@ -10,7 +10,23 @@
 
 {% block main %}
     <form id="questionnaire" method="POST">{% csrf_token %}
-        {{ form.as_p }}
+        {# Include the hidden fields #}
+        {% for hidden in form.hidden_fields %}
+        {{ hidden }}
+        {% endfor %}
+        {# Include the visible fields #}
+        {% for field in form.visible_fields %}
+            {% ifchanged field.field.extra.system %}
+                <div class="system ui-widget-header"> {{ field.field.extra.system }} </div>
+            {% endifchanged %}
+            {% ifchanged field.field.extra.section %}
+                <div class="section ui-widget-header"> -&gt; {{ field.field.extra.section }} </div>
+            {% endifchanged %}
+                {{ field.errors }}
+            <p>
+                {{ field.label_tag }}: {{ field }}
+            </p>
+        {% endfor %}
         <p> <label>&nbsp;</label><input type="submit" value="Submit" /> </p>
     </form>
 {% endblock main %}

@@ -276,4 +276,25 @@ input[type="text"][readonly="readonly"] {
     border-style: dotted ! important;
     background: #E6EAED ! important;
 }
+
+
+/**** Questionnaire PArt ****/
+#questionnaire > div.system {
+    font-size: 200%
+}
+
+#questionnaire > div.section {
+    font-size: 150%;
+    margin: 50px;
+}
+#questionnaire > p > label {
+    font-weight: bold;
+    text-align: right;
+    width: 600px;
+    display: block;
+    float: left;
+    margin-right: 25px;
+}
+#questionnaire > p > input {
+
 }
