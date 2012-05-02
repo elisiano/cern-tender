@@ -1,8 +1,12 @@
 from django import forms
 import couchdbkit
+import pprint
 
 ### Putting it here so it can be used by any form
 db = couchdbkit.ext.django.loading.get_db('documents')
+
+pp = pprint.PrettyPrinter(indent=4)
+
 
 class DocBaseForm(forms.Form):
     # By default _id and _rev are hidden (because are taken from the db), except at
@@ -152,6 +156,7 @@ class EditSystemSectionQuestionForm(forms.Form):
         super(EditSystemSectionQuestionForm, self).__init__(*args, **kwargs)
 
         data = args[0]
+
         # Duck Typing: if some known fields are present they will be added to the form
         ### First Case: QuestionFromList
         i = 1
@@ -161,7 +166,8 @@ class EditSystemSectionQuestionForm(forms.Form):
             i+=1
         ### For range types there are min_, max_ and ts_formatter
         for f in [('min_', None), ('max_', None), ('ts_formatter', 'Tech Spec Formatter')]:
-            if data.get(f[0], None):
+            #print "type: ",type(data.get(f[0], None))
+            if data.get(f[0], None) or type(data.get(f[0], None)) in [int, float]:
                 self.fields[f[0]] = forms.CharField(label=f[1])
 
 

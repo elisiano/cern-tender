@@ -33,24 +33,41 @@ class QuestionFromList(QuestionTemplate):
             self.tech_spec = self.answer_data[self.answer]
         return True
 
-
+#from couchdbkit.schema.properties import FloatProperty, IntegerProperty
 class QuestionRangeTemplate(QuestionTemplate):
     ts_formatter = StringProperty()
 
     def __init__(self, *args, **kwargs):
-        print "args: ", args
-        print "kwargs: ", kwargs
+        for p in ['min_', 'max_', 'answer' ]:
+            if args[0].get(p, None):
+                if isinstance(self._properties[p], FloatProperty):
+                    val = args[0][p]
+                    args[0][p] = float(val)
+                elif isinstance(self._properties[p], IntegerProperty):
+                    val = args[0][p]
+                    args[0][p] = int(val)
+            else:
+                val = args[0].get(p, None)
+                print "it didn't match %s %s %s" % (p, val, type(val) )
+
+
 
         super(QuestionRangeTemplate, self).__init__(*args, **kwargs)
         if not self.tech_spec:
             self.tech_spec = "Dynamically generated during validation"
 
     def validate(self, **params):
-        print "QR: validate params", params
+        for p in ['min_', 'max_', 'answer' ]:
+            if getattr(self, p, None):
+                if isinstance(self._properties[p], FloatProperty):
+                    setattr(self,p,float(getattr(self,p)))
+                elif isinstance(self._properties[p], IntegerProperty):
+                    setattr(self,p,int(getattr(self,p)))
+
         print "self.min_: ", self.min_
         print "self.max_: ", self.max_
         super(QuestionRangeTemplate, self).validate(**params)
-        if self.answer:
+        if self.answer or self.answer == 0.0:
             if self.min_ <= self.answer <= self.max_:
                 if self.ts_formatter:
                     self.tech_spec = self.ts_formatter % self.answer
@@ -70,7 +87,7 @@ class QuestionFloatRange(QuestionRangeTemplate):
     min_ = FloatProperty(required=True)
     max_ = FloatProperty(required=True)
     answer = FloatProperty()
-    
+
 
 class QuestionFreeText(QuestionTemplate):
         answer = StringProperty()  # not used?

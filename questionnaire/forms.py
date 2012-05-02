@@ -16,17 +16,20 @@ def get_form_field(question):
 
     elif question['doc_type'] == 'QuestionIntegerRange':
         label+=' [min=%s, max=%s]' % (question['min_'], question['max_'])
-        min_ = question['min_']
-        max_ = question['max_']
+        initial = question.get('answer', None)
+        field = forms.FloatField(label=label, initial=initial)
+        min_ = int(question['min_'])
+        max_ = int(question['max_'])
         field = forms.IntegerField(label=label, min_value=min_, max_value=max_ )
         #pp.pprint(dir(field))
         return field
 
     elif question['doc_type'] == 'QuestionFloatRange':
         label+=' [min=%s, max=%s]' % (question['min_'], question['max_'])
-        field = forms.FloatField(label=label)
-        field.min_value = question['min_']
-        field.max_value = question['max_']
+        initial = question.get('answer', None)
+        field = forms.FloatField(label=label, initial=initial)
+        field.min_value = float(question['min_'])
+        field.max_value = float(question['max_'])
         return field
 
     else:
