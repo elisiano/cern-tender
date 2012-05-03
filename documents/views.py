@@ -6,10 +6,11 @@ from django.http import HttpResponseRedirect, HttpResponse
 import couchdbkit
 from documents import forms
 from tender.utils import message
+import pprint
 
-
+### Variables used along all the module
 db = couchdbkit.ext.django.loading.get_db('documents')
-
+pp = pprint.PrettyPrinter(indent=4)
 
 ##### Documents
 def index(request):
@@ -24,7 +25,7 @@ def index(request):
 def new(request):
     form = forms.NewDocumentForm(request.POST or None, auto_id=False)
     if form.is_valid():
-        print form.cleaned_data
+        #print form.cleaned_data
         result = db.save_doc(form.cleaned_data)
         if result['ok']:
             return message('Document Saved',
@@ -72,14 +73,23 @@ def validate(request, doc_id):
                 question = section['questions'][q]
                 try:
                     qm = getattr(models, question['doc_type'])
+                    #print "\n\nQuestion Model:", qm
                 except AttributeError:
                     errors['%s > %s > %s' %
                         (system['name'], section['header'], question['question'])
                         ] = 'Question type %s not found' % question['doc_type']
                 else:
                     try:
+                        #print "About to valiate this question"
+                        #pp.pprint(question)
                         _q = qm(question)
-                        _q.validate()
+                        if _q.validate():
+                            #print "Question seems valid"
+                            ### Question looks valid, saving it in the doc
+                            # question is a reference in the original doc
+                            #print "_q:",
+                            #pp.pprint(_q)
+                            question = dict(_q)
                     except couchdbkit.exceptions.BadValueError, e:
                         errors ['%s > %s > %s' %
                         (system['name'], section['header'], question['question'])
@@ -88,10 +98,8 @@ def validate(request, doc_id):
                         errors ['%s > %s > %s' %
                         (system['name'], section['header'], question['question'])
                         ] = "Answer Not Valid: %s" % e
-                    else:
-                        ### Question looks valid, saving it in the doc
-                        # question is a reference in the original doc
-                        question = dict(_q)
+#                    else:
+
     result = db.save_doc(doc)
     if not result['ok']:
         return message('Error',
@@ -125,7 +133,7 @@ def edit_document_root(request, doc_id):
             del doc['rev']
             doc['intro'] = form.cleaned_data['intro']
             # the systems must be reordered
-            print "cleaned_data: ", form.cleaned_data
+            #print "cleaned_data: ", form.cleaned_data
             new_systems = []
             for i in range(0, len(doc.get('systems', []))):
                 for s in doc['systems']:
@@ -203,8 +211,8 @@ def edit_system(request, system_idx, doc_id):
     if request.POST:
         form = forms.EditSystemForm(request.POST, auto_id=False)
         if form.is_valid():
-            print "Valid Form: ", form.cleaned_data
-            print "Form data:", form.data
+            #print "Valid Form: ", form.cleaned_data
+            #print "Form data:", form.data
             ### Must convert back the system structure
             new_sections = []
             for section_idx in range(len(system.get('sections', []))):
@@ -264,12 +272,12 @@ def edit_system_section(request, section_idx, system_idx, doc_id):
     sec = int(section_idx)
     section = doc['systems'][sys]['sections'][sec]
 
-    print "Section:", section
+    #print "Section:", section
     if request.POST:
         form = forms.EditSystemSectionForm(request.POST, auto_id=False)
         if form.is_valid():
-            print "form cleaned", form.cleaned_data
-            print "form data", form.data
+            #print "form cleaned", form.cleaned_data
+            #print "form data", form.data
             new_questions = []
             for i in range(len(section.get('questions', []))):
                 for q in section['questions']:
@@ -318,8 +326,8 @@ def add_system_section_question(request, section_idx, system_idx, doc_id):
     sys = int(system_idx)
     sec = int(section_idx)
     section_questions = [q['question'] for q in db.get(doc_id)['systems'][sys]['sections'][sec].get('questions', [])]
-    print "Section Questions:", section_questions
-    print "ASSQ POST:", request.POST
+    #print "Section Questions:", section_questions
+    #print "ASSQ POST:", request.POST
 
     question_list = questions_db.view('questions/by_category')
     choices_dict = {}
@@ -344,7 +352,7 @@ def add_system_section_question(request, section_idx, system_idx, doc_id):
 
         form = forms.AddSystemSectionQuestionForm(data, auto_id=False)
         if form.is_valid():
-            print "Add Question Form:", form.cleaned_data
+            #print "Add Question Form:", form.cleaned_data
             # The form is clean, at this point we retrieve the question from
             # the catalog and we remove the extra bits
             q = questions_db.get(form.cleaned_data['choice'])
@@ -377,19 +385,19 @@ def edit_system_section_question(request, question_idx, section_idx, system_idx,
     if request.POST:
         form = forms.EditSystemSectionQuestionForm(request.POST, auto_id=True)
         if form.is_valid():
-            print "Cleaned", form.cleaned_data
-            print "Data", form.data
+            #print "Cleaned", form.cleaned_data
+            #print "Data", form.data
             question = form.cleaned_data
             if question['doc_type'] == 'QuestionFromList':
                 i = 1
                 while question.get('answer_%d' % i, None):
-                    print "converting attribute"
+                    #print "converting attribute"
                     question.setdefault('answer_data',{})[question['answer_%d' % i]] = question['tech_spec_%d' % i]
                     del question['answer_%d' % i]
                     del question['tech_spec_%d' % i]
                     i+=1
 
-            print "New Question: ", question
+            #print "New Question: ", question
             doc['systems'][sys]['sections'][sec]['questions'][qid] = question
             result = db.save_doc(doc)
             if result['ok']:
@@ -403,7 +411,7 @@ def edit_system_section_question(request, question_idx, section_idx, system_idx,
                 question['answer_%d' % _t[0]] = _t[1]
                 question['tech_spec_%d' % _t[0]] = question['answer_data'][_t[1]]
             del question['answer_data']
-            print "Mangled Question:", question
+            #print "Mangled Question:", question
         form = forms.EditSystemSectionQuestionForm(question, auto_id=True)
 
     return render_to_response('documents/edit_system_section_question.html',

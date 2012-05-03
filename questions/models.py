@@ -1,5 +1,7 @@
 from couchdbkit.ext.django.schema import StringProperty, Document, DictProperty, IntegerProperty, FloatProperty
 
+import pprint
+pp = pprint.PrettyPrinter(indent=4)
 
 class AnswerNotValid(Exception):
 
@@ -28,6 +30,7 @@ class QuestionFromList(QuestionTemplate):
             self.tech_spec = "Dynamically generated during validation"
 
     def validate(self, **params):
+        print "Validate params:", pp.pprint(params)
         super(QuestionFromList, self).validate(**params)  # if it fails it raises an exception
         if self.answer:
             self.tech_spec = self.answer_data[self.answer]
@@ -48,7 +51,7 @@ class QuestionRangeTemplate(QuestionTemplate):
                     args[0][p] = int(val)
             else:
                 val = args[0].get(p, None)
-                print "it didn't match %s %s %s" % (p, val, type(val) )
+                #print "it didn't match %s %s %s" % (p, val, type(val) )
 
 
 
@@ -64,8 +67,8 @@ class QuestionRangeTemplate(QuestionTemplate):
                 elif isinstance(self._properties[p], IntegerProperty):
                     setattr(self,p,int(getattr(self,p)))
 
-        print "self.min_: ", self.min_
-        print "self.max_: ", self.max_
+        #print "self.min_: ", self.min_
+        #print "self.max_: ", self.max_
         super(QuestionRangeTemplate, self).validate(**params)
         if self.answer or self.answer == 0.0:
             if self.min_ <= self.answer <= self.max_:

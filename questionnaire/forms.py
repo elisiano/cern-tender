@@ -9,6 +9,7 @@ pp = pprint.PrettyPrinter(indent=4)
 
 
 def get_form_field(question):
+    #pp.pprint(question)
     label = question['question']
     if question['doc_type'] == 'QuestionFromList':
         choices = tuple((k,k) for k in question['answer_data'])
@@ -40,19 +41,20 @@ def get_form_field(question):
 class QSystemForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
+        doc = kwargs.pop('doc')
         super(QSystemForm, self).__init__(*args, **kwargs)
-        if kwargs.get('initial',None):
-            self.s_data = kwargs['initial']
-            print"initial self.s_data: ",
-            pp.pprint(self.s_data)
-        else:
-            self.s_data = args[0]
-            print"bond self.s_data: ",
-            pp.pprint(self.s_data)
+#        if kwargs.get('initial',None):
+#            self.s_data = kwargs['initial']
+#            #print"initial self.s_data: ",
+#            #pp.pprint(self.s_data)
+#        else:
+#            self.s_data = args[0]
+#            #print"bond self.s_data: ",
+#            #pp.pprint(self.s_data)
 
-        print "Data: :",
-        pp.pprint(self.data)
-        for sys in range(len(self.s_data.get('systems', []))):
-            for sec in range(len(self.s_data['systems'][sys].get('sections', []))):
-                for q in range(len(self.s_data['systems'][sys]['sections'][sec].get('questions',[]))):
-                    self.fields['sys%d_sec%d_q%d' % (sys, sec, q)] = get_form_field(self.s_data['systems'][sys]['sections'][sec]['questions'][q])
+        #print "Data: :",
+        #pp.pprint(self.data)
+        for sys in range(len(doc.get('systems', []))):
+            for sec in range(len(doc['systems'][sys].get('sections', []))):
+                for q in range(len(doc['systems'][sys]['sections'][sec].get('questions',[]))):
+                    self.fields['sys%d_sec%d_q%d' % (sys, sec, q)] = get_form_field(doc['systems'][sys]['sections'][sec]['questions'][q])
