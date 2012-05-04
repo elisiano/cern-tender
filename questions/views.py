@@ -17,8 +17,7 @@ def index(request):
     db = couchdbkit.ext.django.loading.get_db('questions')
     # categories_count = db.view('questions/categories_count', group=True)
     questions = db.view('questions/by_category')
-    for k in questions:
-        print "k: ", k, "v: ",questions[k]
+
     return render_to_response(  'questions/index.html',
             { 'questions':questions },
             context_instance=RequestContext(request)
@@ -88,11 +87,9 @@ def clone(request, qid):
     return edit(request, result['id'])
 
 def qtype(request):
-    #print request
     if request.method == 'POST':
         form = forms.QuestionForm(request.POST)
         if form.is_valid():
-            print form.cleaned_data
             uri = '/questions/create/%s' % form.cleaned_data['question_type']
             if form.cleaned_data['question_type']== "QuestionFromList":
                 uri += '/%d' % form.cleaned_data['qfl_size']
@@ -106,9 +103,7 @@ def qtype(request):
 
 
 def qcreate(request, type_, qfl_size=0):
-    # print "GET: ",  request.GET
-    # print "POST: ",  request.POST
-    # print "qfl_size in view: ", qfl_size
+
     if not type_:
         return HttpResponse("Invalid Type")
 
@@ -141,7 +136,6 @@ def qcreate(request, type_, qfl_size=0):
         ### Other forms
         else:
             q = getattr(models, type_)(form.cleaned_data)
-        #print "about to save the question:", q.to_json()
         q.save()
         return message('Question Saved', 'The Question "%s" has been saved' % q.question)
 

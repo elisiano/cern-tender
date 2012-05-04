@@ -32,8 +32,6 @@ class QuestionFromListForm(QuestionFormBase):
         document = models.QuestionFromList
 
     def __init__(self, *args, **kwargs):
-        print 'QFLForm args: ', args
-        print 'QFLForm kwargs: ', kwargs
         if 'extra' in kwargs:
             self.qfl_size = kwargs['extra']['qfl_size']
         super(QuestionFromListForm, self).__init__(*args, **kwargs)

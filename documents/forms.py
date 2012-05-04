@@ -42,7 +42,6 @@ class EditDocumentRootForm(DocBaseForm):
         super(EditDocumentRootForm,self).__init__(*args, **kwargs)
         doc =  db.get(args[0]['_id'])
         systems = doc.get('systems',[])
-        print "args: ",args
         for i in range(0,len(systems)):
            self.fields['system_%d' % i] = forms.CharField(widget=forms.HiddenInput())
 
@@ -94,7 +93,6 @@ class AddSystemSectionForm(forms.Form):
 
     def clean_header(self):
         for sec_idx in range(0,len(self.system.get('sections',[]))):
-            print self.system['sections'][sec_idx]
             if self.system['sections'][sec_idx]['header'] == self.cleaned_data['header']:
                 raise forms.ValidationError('There is another section with the same name')
         return self.cleaned_data['header']
@@ -109,7 +107,6 @@ class EditSystemSectionForm(forms.Form):
         section = args[0]
         for i in range(len(section.get('questions',[]))):
             self.fields['question_%d' % i] = forms.CharField(widget=forms.HiddenInput())
-        print "section",section
 
     def question_fields(self):
         for f in self.fields:
@@ -129,15 +126,10 @@ class AddSystemSectionQuestionForm(forms.Form):
             self.fields['choice'].widget.choices = args[0]['choices']
             self.section_questions = args[0].get('section_questions',[])
 
-        print "Form SQ",self.section_questions
-
     def clean_choice(self):
         choice = self.cleaned_data['choice'][3:-2]
-        print "CleanedData", self.cleaned_data
-        print "ValidatingChoiche:", choice
         dbq = couchdbkit.ext.django.loading.get_db('questions')
         qdoc = dbq.get(choice)
-        print "QDoc:",qdoc['question']
         for q in self.section_questions:
             if q == qdoc['question']:
                 raise forms.ValidationError('Question already present in the section')
@@ -166,7 +158,6 @@ class EditSystemSectionQuestionForm(forms.Form):
             i+=1
         ### For range types there are min_, max_ and ts_formatter
         for f in [('min_', None), ('max_', None), ('ts_formatter', 'Tech Spec Formatter')]:
-            #print "type: ",type(data.get(f[0], None))
             if data.get(f[0], None) or type(data.get(f[0], None)) in [int, float]:
                 self.fields[f[0]] = forms.CharField(label=f[1])
 

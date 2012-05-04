@@ -63,8 +63,7 @@ class QuestionRangeTemplate(QuestionTemplate):
                 elif isinstance(self._properties[p], IntegerProperty):
                     setattr(self,p,int(getattr(self,p)))
 
-        #print "self.min_: ", self.min_
-        #print "self.max_: ", self.max_
+
         super(QuestionRangeTemplate, self).validate(**params)
         if self.answer or self.answer == 0.0:
             if self.min_ <= self.answer <= self.max_:

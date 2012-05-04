@@ -33,7 +33,6 @@ def questionnaire(request, doc_id):
         form = forms.QSystemForm(form_data, doc=doc, auto_id=True)
 
         if form.is_valid():
-#            pp.pprint(form.cleaned_data)
             # now there is to convert back the key sysX_secY_qZ to the respective entry
             for f in form.cleaned_data:
                 match = pattern.match(str(f))
@@ -61,7 +60,6 @@ def questionnaire(request, doc_id):
                     if question['answer'] or type(question['answer']) in [ int, float]:
                         initial['sys%d_sec%d_q%d' % (sys, sec, q)] = question['answer']
         form = forms.QSystemForm(initial=initial, doc=doc, auto_id=True)
-        pp.pprint([form.data])
 
     doc['id'] = doc['_id']
     doc['rev'] = doc['_rev']
@@ -78,7 +76,6 @@ def questionnaire(request, doc_id):
                 'section': doc['systems'][sys]['sections'][sec]['header']
                     }
         f.field.extra = form_extra_data[f.name]
-        #pp.pprint(form_extra_data)
 
     return render_to_response('questionnaire/form.html',
                           {'form': form, 'doc': doc},

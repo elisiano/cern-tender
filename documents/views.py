@@ -15,8 +15,6 @@ pp = pprint.PrettyPrinter(indent=4)
 ##### Documents
 def index(request):
     documents = db.all_docs()
-    #for k in documents:
-    #    print "k: ", k, "v: ",documents[k]
     return render_to_response('documents/index.html',
                               {'documents': documents},
                                 context_instance=RequestContext(request))
@@ -25,7 +23,6 @@ def index(request):
 def new(request):
     form = forms.NewDocumentForm(request.POST or None, auto_id=False)
     if form.is_valid():
-        #print form.cleaned_data
         result = db.save_doc(form.cleaned_data)
         if result['ok']:
             return message('Document Saved',
@@ -50,7 +47,6 @@ def view(request, doc_id):
 
 
 def delete(request, doc_id):
-    #print _id
     result = db.delete_doc(doc_id)
     if result['ok']:
         return message('Document Deleted',
@@ -73,15 +69,12 @@ def validate(request, doc_id):
                 question = section['questions'][q]
                 try:
                     qm = getattr(models, question['doc_type'])
-                    #print "\n\nQuestion Model:", qm
                 except AttributeError:
                     errors['%s > %s > %s' %
                         (system['name'], section['header'], question['question'])
                         ] = 'Question type %s not found' % question['doc_type']
                 else:
                     try:
-                        #print "About to valiate this question"
-                        #pp.pprint(question)
                         _q = qm(question)
                         if _q.validate():
                             question = dict(_q)
@@ -128,7 +121,6 @@ def edit_document_root(request, doc_id):
             del doc['rev']
             doc['intro'] = form.cleaned_data['intro']
             # the systems must be reordered
-            #print "cleaned_data: ", form.cleaned_data
             new_systems = []
             for i in range(0, len(doc.get('systems', []))):
                 for s in doc['systems']:
@@ -151,7 +143,6 @@ def edit_document_root(request, doc_id):
         for i in range(0, len(doc.get('systems', []))):
             data['system_%d' % i] = doc['systems'][i]['name']
         form = forms.EditDocumentRootForm(data, auto_id=False)
-    #print doc
     return render_to_response('documents/edit.html',
                             {'form': form, 'extra_data': {'doc': doc or None}},
                             context_instance=RequestContext(request))
@@ -206,8 +197,6 @@ def edit_system(request, system_idx, doc_id):
     if request.POST:
         form = forms.EditSystemForm(request.POST, auto_id=False)
         if form.is_valid():
-            #print "Valid Form: ", form.cleaned_data
-            #print "Form data:", form.data
             ### Must convert back the system structure
             new_sections = []
             for section_idx in range(len(system.get('sections', []))):
@@ -267,12 +256,9 @@ def edit_system_section(request, section_idx, system_idx, doc_id):
     sec = int(section_idx)
     section = doc['systems'][sys]['sections'][sec]
 
-    #print "Section:", section
     if request.POST:
         form = forms.EditSystemSectionForm(request.POST, auto_id=False)
         if form.is_valid():
-            #print "form cleaned", form.cleaned_data
-            #print "form data", form.data
             new_questions = []
             for i in range(len(section.get('questions', []))):
                 for q in section['questions']:
@@ -321,8 +307,7 @@ def add_system_section_question(request, section_idx, system_idx, doc_id):
     sys = int(system_idx)
     sec = int(section_idx)
     section_questions = [q['question'] for q in db.get(doc_id)['systems'][sys]['sections'][sec].get('questions', [])]
-    #print "Section Questions:", section_questions
-    #print "ASSQ POST:", request.POST
+
 
     question_list = questions_db.view('questions/by_category')
     choices_dict = {}
@@ -333,9 +318,7 @@ def add_system_section_question(request, section_idx, system_idx, doc_id):
         choices_dict[v['category']].append((v['_id'], v['question']))
 
     _ = []
-    #print choices_dict
     for k in choices_dict:
-        #print k, "==>", tuple(choices_dict[k])
         _.append((k, tuple(sorted(choices_dict[k], key=lambda x: x[1]))))
     choices = tuple(_)
     data = {}
@@ -347,7 +330,6 @@ def add_system_section_question(request, section_idx, system_idx, doc_id):
 
         form = forms.AddSystemSectionQuestionForm(data, auto_id=False)
         if form.is_valid():
-            #print "Add Question Form:", form.cleaned_data
             # The form is clean, at this point we retrieve the question from
             # the catalog and we remove the extra bits
             q = questions_db.get(form.cleaned_data['choice'])
@@ -380,19 +362,16 @@ def edit_system_section_question(request, question_idx, section_idx, system_idx,
     if request.POST:
         form = forms.EditSystemSectionQuestionForm(request.POST, auto_id=True)
         if form.is_valid():
-            #print "Cleaned", form.cleaned_data
-            #print "Data", form.data
+
             question = form.cleaned_data
             if question['doc_type'] == 'QuestionFromList':
                 i = 1
                 while question.get('answer_%d' % i, None):
-                    #print "converting attribute"
                     question.setdefault('answer_data',{})[question['answer_%d' % i]] = question['tech_spec_%d' % i]
                     del question['answer_%d' % i]
                     del question['tech_spec_%d' % i]
                     i+=1
 
-            #print "New Question: ", question
             doc['systems'][sys]['sections'][sec]['questions'][qid] = question
             result = db.save_doc(doc)
             if result['ok']:
@@ -406,7 +385,6 @@ def edit_system_section_question(request, question_idx, section_idx, system_idx,
                 question['answer_%d' % _t[0]] = _t[1]
                 question['tech_spec_%d' % _t[0]] = question['answer_data'][_t[1]]
             del question['answer_data']
-            #print "Mangled Question:", question
         form = forms.EditSystemSectionQuestionForm(question, auto_id=True)
 
     return render_to_response('documents/edit_system_section_question.html',
