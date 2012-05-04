@@ -30,7 +30,6 @@ class QuestionFromList(QuestionTemplate):
             self.tech_spec = "Dynamically generated during validation"
 
     def validate(self, **params):
-        print "Validate params:", pp.pprint(params)
         super(QuestionFromList, self).validate(**params)  # if it fails it raises an exception
         if self.answer:
             self.tech_spec = self.answer_data[self.answer]
@@ -51,10 +50,7 @@ class QuestionRangeTemplate(QuestionTemplate):
                     args[0][p] = int(val)
             else:
                 val = args[0].get(p, None)
-                #print "it didn't match %s %s %s" % (p, val, type(val) )
-
-
-
+                
         super(QuestionRangeTemplate, self).__init__(*args, **kwargs)
         if not self.tech_spec:
             self.tech_spec = "Dynamically generated during validation"

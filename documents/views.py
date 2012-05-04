@@ -84,12 +84,8 @@ def validate(request, doc_id):
                         #pp.pprint(question)
                         _q = qm(question)
                         if _q.validate():
-                            #print "Question seems valid"
-                            ### Question looks valid, saving it in the doc
-                            # question is a reference in the original doc
-                            #print "_q:",
-                            #pp.pprint(_q)
                             question = dict(_q)
+                        del _q
                     except couchdbkit.exceptions.BadValueError, e:
                         errors ['%s > %s > %s' %
                         (system['name'], section['header'], question['question'])
@@ -98,7 +94,6 @@ def validate(request, doc_id):
                         errors ['%s > %s > %s' %
                         (system['name'], section['header'], question['question'])
                         ] = "Answer Not Valid: %s" % e
-#                    else:
 
     result = db.save_doc(doc)
     if not result['ok']:
