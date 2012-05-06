@@ -40,17 +40,18 @@ class QuestionRangeTemplate(QuestionTemplate):
     ts_formatter = StringProperty()
 
     def __init__(self, *args, **kwargs):
-        for p in ['min_', 'max_', 'answer' ]:
-            if args[0].get(p, None):
-                if isinstance(self._properties[p], FloatProperty):
-                    val = args[0][p]
-                    args[0][p] = float(val)
-                elif isinstance(self._properties[p], IntegerProperty):
-                    val = args[0][p]
-                    args[0][p] = int(val)
-            else:
-                val = args[0].get(p, None)
-                
+        if args:
+            for p in ['min_', 'max_', 'answer' ]:
+                if args[0].get(p, None):
+                    if isinstance(self._properties[p], FloatProperty):
+                        val = args[0][p]
+                        args[0][p] = float(val)
+                    elif isinstance(self._properties[p], IntegerProperty):
+                        val = args[0][p]
+                        args[0][p] = int(val)
+                else:
+                    val = args[0].get(p, None)
+
         super(QuestionRangeTemplate, self).__init__(*args, **kwargs)
         if not self.tech_spec:
             self.tech_spec = "Dynamically generated during validation"
@@ -62,9 +63,8 @@ class QuestionRangeTemplate(QuestionTemplate):
                     setattr(self,p,float(getattr(self,p)))
                 elif isinstance(self._properties[p], IntegerProperty):
                     setattr(self,p,int(getattr(self,p)))
-
-
         super(QuestionRangeTemplate, self).validate(**params)
+
         if self.answer or self.answer == 0.0:
             if self.min_ <= self.answer <= self.max_:
                 if self.ts_formatter:

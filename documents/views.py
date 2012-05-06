@@ -7,6 +7,8 @@ import couchdbkit
 from documents import forms
 from tender.utils import message
 import pprint
+from documents.classes import TenderDocumentValidator
+
 
 ### Variables used along all the module
 db = couchdbkit.ext.django.loading.get_db('documents')
@@ -57,54 +59,20 @@ def delete(request, doc_id):
 
 
 def validate(request, doc_id):
-    doc = db.get(doc_id)
-    errors = {}
-    from questions import models
-    ### validating questions
-    for sys in range(len(doc.get('systems',[]))):
-        system = doc['systems'][sys]
-        for sec in range(len(system.get('sections',[]))):
-            section = system['sections'][sec]
-            for q in range(len(section.get('questions',[]))):
-                question = section['questions'][q]
-                try:
-                    qm = getattr(models, question['doc_type'])
-                except AttributeError:
-                    errors['%s > %s > %s' %
-                        (system['name'], section['header'], question['question'])
-                        ] = 'Question type %s not found' % question['doc_type']
-                else:
-                    try:
-                        _q = qm(question)
-                        if _q.validate():
-                            question = dict(_q)
-                        del _q
-                    except couchdbkit.exceptions.BadValueError, e:
-                        errors ['%s > %s > %s' %
-                        (system['name'], section['header'], question['question'])
-                        ] = "Bad Value: %s" % e
-                    except models.AnswerNotValid,e :
-                        errors ['%s > %s > %s' %
-                        (system['name'], section['header'], question['question'])
-                        ] = "Answer Not Valid: %s" % e
+    validator = TenderDocumentValidator(doc_id)
+    result = validator.validate()
 
-    result = db.save_doc(doc)
-    if not result['ok']:
-        return message('Error',
-                       'Error Saving Document "%s" after valiation process' % doc_id)
-
-    if not errors:
+    if not result.get('errors',{}):
         ahref= reverse('documents.views.view', args=(doc_id,))
-        return message('Message Validated!',
+        return message('Document Validated!',
                        'Congratulations, <a href="%s">%s</a> passed validation!' % (ahref, doc_id))
 
-
+    doc = db.get(doc_id)
     doc['id'] = doc['_id']
     doc['rev'] = doc['_rev']
     return render_to_response('documents/validate_errors.html',
-                              {'errors': errors, 'doc': doc},
+                              {'errors': result['errors'], 'doc': doc},
                               context_instance=RequestContext(request))
-    return HttpResponse('To Be Finished')
 
 def edit_document_root(request, doc_id):
 
@@ -128,12 +96,12 @@ def edit_document_root(request, doc_id):
                         new_systems.append(s)
                         break
             doc['systems'] = new_systems
-            #return HttpResponse('Not saved yet')
             result = db.save_doc(doc)
-            ahref = reverse('documents.views.view', args=(doc_id,))
+            #ahref = reverse('documents.views.view', args=(doc_id,))
             if result['ok']:
-                return message('Document Updated',
-                               'The introduction part of <a href="%s">%s</a> has been updated correctly' % (ahref, doc_id))
+                return HttpResponseRedirect(reverse('documents.views.view', args=(doc_id, )))
+                #return message('Document Updated',
+                #               'The introduction part of <a href="%s">%s</a> has been updated correctly' % (ahref, doc_id))
             else:
                 return message('Error',
                                'Error while updating document "%s"' % doc_id)
@@ -192,11 +160,13 @@ def delete_system(request, index, doc_id):
 def edit_system(request, system_idx, doc_id):
     doc = db.get(doc_id)
     doc['id'] = doc['_id']  # used in the header of the tepmplate
-    system = doc['systems'][int(system_idx)]
+    sys_idx = int(system_idx)
+    system = doc['systems'][sys_idx]
 
     if request.POST:
         form = forms.EditSystemForm(request.POST, auto_id=False)
         if form.is_valid():
+            pp.pprint(form.cleaned_data)
             ### Must convert back the system structure
             new_sections = []
             for section_idx in range(len(system.get('sections', []))):
@@ -204,7 +174,16 @@ def edit_system(request, system_idx, doc_id):
                     if section['header'] == form.data['section_%d' % section_idx]:
                         new_sections.append(section)
                         break
-            doc['systems'][int(system_idx)]['sections'] = new_sections
+            doc['systems'][sys_idx]['sections'] = new_sections
+            doc['systems'][sys_idx]['description'] = form.cleaned_data['description']
+            rules=[]
+            for line in form.cleaned_data['rules'].split('\n'):
+                line = line.strip('\r\n')
+                if line:
+                    rules.append(line)
+            print "Converted rules:", pp.pprint(rules)
+            doc['systems'][sys_idx]['rules'] = rules
+
             result = db.save_doc(doc)
             if result['ok']:
                 return HttpResponseRedirect(reverse('documents.views.edit_document_root', args=(doc_id, )))
@@ -215,6 +194,12 @@ def edit_system(request, system_idx, doc_id):
     else:
         for section in range(len(system.get('sections', []))):
             system['section_%d' % section] = system['sections'][section]['header']
+
+        if system.get('rules', None):
+            system['rules'] = "\r\n\r\n".join(system['rules'])
+        else:
+            ### to avoid having an empty list displayed
+            del system['rules']
         form = forms.EditSystemForm(system, auto_id=False)
 
     system['index'] = int(system_idx)

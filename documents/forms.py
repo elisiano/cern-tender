@@ -5,7 +5,7 @@ import pprint
 ### Putting it here so it can be used by any form
 db = couchdbkit.ext.django.loading.get_db('documents')
 
-pp = pprint.PrettyPrinter(indent=4)
+pp = pprint.PrettyPrinter(indent=12)
 
 
 class DocBaseForm(forms.Form):
@@ -64,14 +64,37 @@ class AddSystemForm(DocBaseForm):
 
 class EditSystemForm(forms.Form):
     description = forms.CharField(widget=forms.Textarea(), required=False)
-    rules = forms.CharField(widget=forms.Textarea(), required=False)
+    rules = forms.CharField(widget=forms.Textarea(attrs={'cols':120}), required=False, help_text="""<pre>
+    Rules are Python expressions, one per line, accessing a dictionary called "properties".
+    The dictionary will contain the defined categories -> tags as nested keys.
+
+    Example:
+        properties['psu']['modules_number'] >= 2 and properties['psu']['modules_redundant'] == 'Yes'
+
+    </pre>""")
 
     def __init__(self, *args, **kwargs):
         super(EditSystemForm, self).__init__(*args, **kwargs)
         system = args[0]
-        for i in range(len(system.get('sections',[]))):
-            self.fields['section_%d' % i] = forms.CharField(widget=forms.HiddenInput())
+        properties = {}
+        for s in range(len(system.get('sections',[]))):
+            self.fields['section_%d' % s] = forms.CharField(widget=forms.HiddenInput())
+            for q in range(len(system['sections'][s].get('questions',[]))):
+                question = system['sections'][s]['questions'][q]
+                properties.setdefault(question['category'], {})[question['tag']] = question['answer']
 
+        indent = " " * 8
+        _txt = ""
+        for cat_k in properties:
+            for tag_k in properties[cat_k]:
+                _txt += "properties['%s']['%s'] (value: %s)\n" % (cat_k, tag_k, properties[cat_k][tag_k].__repr__())
+        _txt = _txt.replace('\n','\n%s' % indent)
+        print _txt
+        help_text = """<pre>
+    Currently Defined Properties:
+        %s
+    </pre>""" % (_txt if _txt else "No property defined at the moment")
+        self.fields['rules'].help_text += help_text
 
     ### Iterator over fields starting with section_
     def section_fields(self):
