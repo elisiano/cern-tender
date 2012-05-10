@@ -21,7 +21,13 @@ def questionnaire_pdf(request, doc_id):
         return message('Error','Error getting document %s: %s' % (doc_id, e))
     pp.pprint(request.GET)
     response = HttpResponse(mimetype='application/pdf')
-    response['Content-Disposition'] = 'filename=%s.pdf' % slugify(doc_id)
+    import re
+    filename=doc_id
+    pattern = re.compile(r'[:|\/";\?]')
+    for s in pattern.findall(filename):
+        filename = filename.replace(s, '-')
+
+    response['Content-Disposition'] = 'filename=%s-techq.pdf' % filename
 
     start_idx = request.GET.get('start_index',1)
     pdf = utils.get_questionnaire_pdf(response, doc_id, int(start_idx))
