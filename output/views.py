@@ -5,7 +5,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponse
 import couchdbkit
 from tender.utils import message
-import utils 
+import utils
 import pprint
 from django.template.defaultfilters import slugify
 
@@ -14,7 +14,7 @@ db = couchdbkit.ext.django.loading.get_db('documents')
 pp = pprint.PrettyPrinter(indent=4)
 
 def questionnaire_pdf(request, doc_id):
-    doc = None    
+    doc = None
     try:
         doc = db.get(doc_id)
     except Exception, e:
@@ -22,7 +22,10 @@ def questionnaire_pdf(request, doc_id):
     pp.pprint(request.GET)
     response = HttpResponse(mimetype='application/pdf')
     response['Content-Disposition'] = 'filename=%s.pdf' % slugify(doc_id)
-    
-    start_idx = request.GET.get('start_index',1)    
+
+    start_idx = request.GET.get('start_index',1)
     pdf = utils.get_questionnaire_pdf(response, doc_id, int(start_idx))
     return response
+
+def document_pdf(request, doc_id):
+    pass

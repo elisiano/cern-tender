@@ -88,6 +88,7 @@ def edit_document_root(request, doc_id):
             del doc['id']
             del doc['rev']
             doc['intro'] = form.cleaned_data['intro']
+            doc['title'] = form.cleaned_data['title']
             # the systems must be reordered
             new_systems = []
             for i in range(0, len(doc.get('systems', []))):
