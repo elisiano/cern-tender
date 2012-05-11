@@ -1,9 +1,10 @@
 import couchdbkit
-
-from reportlab.lib.styles import getSampleStyleSheet
+import textwrap
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib import colors
-from reportlab.lib.units import cm, inch
-from reportlab.platypus import Paragraph, Table, TableStyle, SimpleDocTemplate, Spacer
+from reportlab.lib.units import cm
+from reportlab.platypus import Paragraph, Table, TableStyle, SimpleDocTemplate, Spacer, PageBreak
+from reportlab.lib.enums import TA_JUSTIFY
 style = getSampleStyleSheet()
 styleN = style['Normal']
 styleH1 = style['Heading1']
@@ -66,7 +67,7 @@ def tq_first_page(canvas, doc, doc_id='<doc id>', title='<title>'):
 
     title_size=34
     canvas.setFont('Times-BoldItalic', title_size)
-    import textwrap
+
     current_y = PAGE_HEIGHT-210
     for line in textwrap.wrap(title,35):
         canvas.drawCentredString(PAGE_WIDTH/2.0, current_y, line)
@@ -87,11 +88,32 @@ def get_questionnaire_pdf(filename, doc_id, start_index=1):
     """ Method which writes to @filename a pdf representing the questionnaire of @doc_id
     By default the first system is numbered starting with 1, this can be overwritten with the @start_index parameter.
     Subsequent systems will have sequential numbers"""
+    P = Paragraph
 
     doc = db.get(doc_id)
     story = [Spacer(1,10*cm)]
-    #story.append(Paragraph('Questionnarire for %s' % doc_id, styleH1))
+    story.append( P(doc['questionnaire_intro'],
+                  ParagraphStyle( name='ItalicJustified',
+                                  alignment=TA_JUSTIFY,
+                                  fontName='Times-Italic')))
     story.append(Spacer(1,3*cm))
+
+
+    company_data = [['0', P('Company and Offer',styleH1), ''],
+                    ['0.1', P('Company Name', styleN), ''],
+                    ['0.2', P('if alternative proposal(s) submitted: Bid (Conforming bid or alternative proposal)', styleN), '']
+                ]
+    company_style = TableStyle([
+                ('GRID',    (0, 0), (-1, -1), 0.25, colors.black),
+                ('VALIGN',  (0, 0), (-1, -1), 'MIDDLE'),
+                #('ALIGN',   (2, 0), (3, -1), 'CENTER'),
+                ('BACKGROUND',  (0, 0), (-1, 0), colors.lightgrey),
+        ])
+
+    table = Table(company_data, colWidths=[ 1.5*cm, 11.5*cm, 6*cm], style=company_style)
+    story.append(table)
+    story.append(PageBreak())
+
     data = [[ 'Ref', 'Header/Question', 'Type', 'Answer' ]]
 
     # this lis will contain the indeces of the rows which shoud have a differnt
@@ -101,16 +123,16 @@ def get_questionnaire_pdf(filename, doc_id, start_index=1):
 
     for sys in range(len(doc.get('systems', []))):
         system = doc['systems'][sys]
-        data.append(['%s' % (start_index + sys), Paragraph(system['name'], styleH2), '', ''])
+        data.append(['%s' % (start_index + sys), P(system['name'], styleH2), '', ''])
         headers_rows.append(len(data)-1)
         for sec in range(len(system.get('sections',[]))):
             section = system['sections'][sec]
-            data.append([ '%s.%s' % (start_index + sys, sec + 1), Paragraph(section['header'], styleH3), '', ''])
+            data.append([ '%s.%s' % (start_index + sys, sec + 1), P(section['header'], styleH3), '', ''])
             headers_rows.append(len(data)-1)
             for q in range(len(section.get('questions', []))):
                 question = section['questions'][q]
                 data.append( [  "%d.%d.%d" % (start_index + sys, sec + 1, q + 1),
-                                Paragraph(question['question'], styleN),
+                                P(question['question'], styleN),
                                 _get_type(question),
                                 str(question['answer'])
                             ])

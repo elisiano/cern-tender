@@ -41,6 +41,7 @@ class QuestionRangeTemplate(QuestionTemplate):
     ts_formatter = StringProperty()
 
     def __init__(self, *args, **kwargs):
+        self._properties['tech_spec'].required=False
         if args:
             for p in ['min_', 'max_', 'answer' ]:
                 if args[0].get(p, None):

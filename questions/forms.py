@@ -47,18 +47,25 @@ class QuestionIntegerRangeForm(QuestionFormBase):
     class Meta:
         document = models.QuestionIntegerRange
 
+    def __init__(self, *args, **kwargs):
+        super(QuestionIntegerRangeForm, self).__init__(*args, **kwargs)
+        self.fields['tech_spec'].required = False
 
 class QuestionFloatRangeForm(QuestionFormBase):
 
     class Meta:
         document = models.QuestionFloatRange
 
+    def __init__(self, *args, **kwargs):
+        super(QuestionFloatRangeForm, self).__init__(*args, **kwargs)
+        self.fields['tech_spec'].required = False
+
 
 class QuestionFreeTextForm(QuestionFormBase):
 
     class Meta:
         document = models.QuestionFreeText
-    
+
     def __init__(self,*args, **kwargs):
         super(QuestionFreeTextForm, self).__init__(*args, **kwargs)
         self.fields['answer'].widget = widget=forms.Textarea(attrs={'class':'ui-widget ui-corner-all','rows':10, 'cols':30})
