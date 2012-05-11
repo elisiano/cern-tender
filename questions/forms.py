@@ -35,6 +35,7 @@ class QuestionFromListForm(QuestionFormBase):
         if 'extra' in kwargs:
             self.qfl_size = kwargs['extra']['qfl_size']
         super(QuestionFromListForm, self).__init__(*args, **kwargs)
+        self.fields['tech_spec'].required = False
 
         for i in range(1, getattr(self,'qfl_size',0)+1):
            self.fields['answer_%s' % i] = forms.CharField(label='Answer %s' %i)

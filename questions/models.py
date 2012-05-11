@@ -24,6 +24,7 @@ class QuestionFromList(QuestionTemplate):
     answer_data = DictProperty(required=True)
 
     def __init__(self, *args, **kwargs):
+        self._properties['tech_spec'].required=False
         super(QuestionFromList, self).__init__(*args, **kwargs)
         self._properties['answer'].choices = self.answer_data  # the Property extracts the keys automagically
         if not self.tech_spec:
