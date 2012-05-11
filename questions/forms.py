@@ -58,3 +58,7 @@ class QuestionFreeTextForm(QuestionFormBase):
 
     class Meta:
         document = models.QuestionFreeText
+    
+    def __init__(self,*args, **kwargs):
+        super(QuestionFreeTextForm, self).__init__(*args, **kwargs)
+        self.fields['answer'].widget = widget=forms.Textarea(attrs={'class':'ui-widget ui-corner-all','rows':10, 'cols':30})

@@ -88,6 +88,7 @@ def edit_document_root(request, doc_id):
             del doc['id']
             del doc['rev']
             doc['intro'] = form.cleaned_data['intro']
+            doc['questionnaire_intro'] = form.cleaned_data['questionnaire_intro']
             doc['title'] = form.cleaned_data['title']
             # the systems must be reordered
             new_systems = []
@@ -200,7 +201,10 @@ def edit_system(request, system_idx, doc_id):
             system['rules'] = "\r\n\r\n".join(system['rules'])
         else:
             ### to avoid having an empty list displayed
-            del system['rules']
+            try:
+                del system['rules']
+            except KeyError:
+                pass
         form = forms.EditSystemForm(system, auto_id=False)
 
     system['index'] = int(system_idx)

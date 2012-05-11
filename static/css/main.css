@@ -33,13 +33,14 @@ form {
     background: #E3F1FA;
 }
 
-input, select {
+input, select, textarea {
     border: 1px solid black;
     /* background: #9cf; */
     background: #EEF7FC;
     width: 350px;
     margin: 3px;
 }
+
 
 /*
 input[type="submit"] {
@@ -187,6 +188,15 @@ ul.errorlist+p {
     margin-top: 100px;
 }
 
+#document_form > p > textarea {
+    width: 800px ! important;
+    clear: right;
+    display: block;
+    margin-left: 200px;
+    margin-bottom: 50px;
+    /*float: right;*/
+}
+
 /****** Systems Part ******/
 a.system, a.section, a.question {
     width: 75px;
@@ -238,6 +248,15 @@ span.system.name, span.section.name, span.question.name {
     margin: 25px;
     margin-top: 100px;
 }
+
+#edit_system > p > textarea {
+    margin-left: 100px;
+    margin-bottom: 50px;
+    display: block;
+    clear: both;
+    width: 800px;
+    height: 300px;
+}
 /**************************/
 
 /**** Sections Part *****/
@@ -278,7 +297,7 @@ input[type="text"][readonly="readonly"] {
 }
 
 
-/**** Questionnaire PArt ****/
+/**** Questionnaire Part ****/
 #questionnaire > div.system {
     font-size: 200%
 }
