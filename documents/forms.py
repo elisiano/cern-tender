@@ -45,8 +45,19 @@ class EditDocumentRootForm(DocBaseForm):
         super(EditDocumentRootForm,self).__init__(*args, **kwargs)
         doc =  db.get(args[0]['_id'])
         systems = doc.get('systems',[])
+        contacts = doc.get('contacts',[])
         for i in range(0,len(systems)):
            self.fields['system_%d' % i] = forms.CharField(widget=forms.HiddenInput())
+        for i in range(0,len(contacts)):
+             self.fields['contact_%d' % i ] = forms.CharField(widget=forms.HiddenInput())
+
+class ContactForm(forms.Form):
+    type_ = forms.CharField()
+    name = forms.CharField()
+    address = forms.CharField(widget=forms.Textarea(attrs={'class':'ui-widget ui-corner-all','rows':4, 'cols':20}))
+    tel = forms.CharField()
+    fax = forms.CharField()
+    email = forms.EmailField(label='E-mail')
 
 
 class AddSystemForm(DocBaseForm):

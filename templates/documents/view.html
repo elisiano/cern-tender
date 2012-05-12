@@ -38,6 +38,19 @@
             {% endfor %}
             </ul>
         </div>
+        <div id="contacts" class="ui-widget">
+            <div class="ui-widget-header">Contacts</div>
+            <ul class="ui-widget-content">
+            {% for contact in doc.contacts %}
+                <li class="ui-state-default">
+                    <span class="ui-icon ui-icon-info"></span>
+                    <span class="ui-state-default contact">{{contact.name}} ({{contact.type_}})</span>
+                </li>
+            {% empty %}
+                <li class="ui-state-default">No Contacts Defined</li>
+            {% endfor%}
+            </ul>
+        </div>
         <div class='document actions'>
             <a href="/questionnaire/{{doc.id}}">Questionnaire</a>
             <a href="/output/questionnaire/pdf/{{doc.id}}">Questionnaire PDF</a>

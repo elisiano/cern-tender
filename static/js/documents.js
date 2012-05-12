@@ -35,6 +35,15 @@ $(document).ready(function() {
                 }
         }
     })
+    // Sortable list of the contacts in the document
+    $('#contacts > ul.sortable').sortable({
+        beforeStop: function(event,ui) {
+                list = $(this).find('li > span.name');
+                for(i=0; i<list.length; i++) {
+                    $('input[name=contact_'+ i +']').val(list[i].innerHTML)
+                }
+        }
+    })
 
 
 });

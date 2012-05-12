@@ -8,7 +8,7 @@ from documents import forms
 from tender.utils import message
 import pprint
 from documents.classes import TenderDocumentValidator
-
+import re
 
 ### Variables used along all the module
 db = couchdbkit.ext.django.loading.get_db('documents')
@@ -98,6 +98,23 @@ def edit_document_root(request, doc_id):
                         new_systems.append(s)
                         break
             doc['systems'] = new_systems
+
+            new_contacts = []
+            for i in range(0, len(doc.get('contacts', []))):
+                _ = form.cleaned_data['contact_%d' % i]
+                pattern = re.compile(r' \(.*\)$')
+                match = pattern.search(_)
+                if match:
+                    _ = _[:match.start()]
+
+                for c in doc['contacts']:
+                    print "teting '%s' == '%s'" % (_,c['name'])
+                    if _ == c['name']:
+                        print 'contact match'
+                        new_contacts.append(c)
+                        break
+            doc['contacts'] = new_contacts
+
             result = db.save_doc(doc)
             #ahref = reverse('documents.views.view', args=(doc_id,))
             if result['ok']:
@@ -112,10 +129,68 @@ def edit_document_root(request, doc_id):
         data = doc
         for i in range(0, len(doc.get('systems', []))):
             data['system_%d' % i] = doc['systems'][i]['name']
+        for i in range(0, len(doc.get('contacts',[]))):
+            data['contact_%d' % i] = doc['contacts'][i]['name']
         form = forms.EditDocumentRootForm(data, auto_id=False)
     return render_to_response('documents/edit.html',
                             {'form': form, 'extra_data': {'doc': doc or None}},
                             context_instance=RequestContext(request))
+
+##### Document > Contacts
+
+def add_contact(request, doc_id):
+
+    doc = db.get(doc_id)
+
+    form = forms.ContactForm(request.POST or None)
+    if form.is_valid():
+        doc.setdefault('contacts',[]).append(form.cleaned_data)
+        result = db.save_doc(doc)
+        if result['ok']:
+            return HttpResponseRedirect(reverse('documents.views.edit_document_root', args=(doc_id, )))
+        else:
+            return message('Error',
+                               'Error while updating document "%s"' % doc_id)
+
+    return render_to_response('documents/contact.html',
+                              {'form': form},
+                                context_instance=RequestContext(request))
+
+
+def delete_contact(request, index, doc_id):
+    doc = db.get(doc_id)
+    idx = int(index)
+    del doc['contacts'][idx]
+
+    result = db.save_doc(doc)
+    if result['ok']:
+        return HttpResponseRedirect(reverse('documents.views.edit_document_root', args=(doc_id, )))
+    else:
+        return message('Error',
+                           'Error while updating document "%s"' % doc_id)
+
+
+def edit_contact(request, index, doc_id):
+    doc = db.get(doc_id)
+    idx = int(index)
+
+    if request.POST:
+        form = forms.ContactForm(request.POST)
+        if form.is_valid():
+            doc['contacts'][idx] = form.cleaned_data
+            result = db.save_doc(doc)
+            if result['ok']:
+                return HttpResponseRedirect(reverse('documents.views.edit_document_root', args=(doc_id, )))
+            else:
+                return message('Error',
+                               'Error while updating document "%s"' % doc_id)
+
+    else:
+        form = forms.ContactForm(initial=doc['contacts'][idx])
+
+    return render_to_response('documents/contact.html',
+                              {'form': form},
+                                context_instance=RequestContext(request))
 
 
 ##### Document > Systems

@@ -10,6 +10,7 @@ styleN = style['Normal']
 styleH1 = style['Heading1']
 styleH2 = style['Heading2']
 styleH3 = style['Heading3']
+P = Paragraph
 
 #from reportlab.rl_config import defaultPageSize
 from reportlab.lib.pagesizes import A4 as defaultPageSize
@@ -40,16 +41,16 @@ def _get_type(question):
         return "Free Text"
 
 
-def _print_footer(canvas, doc_id, page):
+def _print_footer(canvas, left_string, page):
     canvas.setFont('Times-Roman',9)
-    canvas.drawString(2*cm, cm, "%s - Technical Questionnaire" % doc_id)
+    canvas.drawString(2*cm, cm, left_string)
 
     page_str="Page %3d" % page
     size = canvas.stringWidth(page_str, 'Times-Roman', 9)
     canvas.drawString(PAGE_WIDTH - size - 4*cm, cm, page_str)
 
 
-def tq_first_page(canvas, doc, doc_id='<doc id>', title='<title>'):
+def _first_page(canvas, doc, doc_id='<doc id>', title='<title>', type_="<type>"):
     canvas.saveState()
     canvas.setFont('Times-Bold', 12)
     canvas.drawCentredString(PAGE_WIDTH/2.0, PAGE_HEIGHT-40,
@@ -63,7 +64,7 @@ def tq_first_page(canvas, doc, doc_id='<doc id>', title='<title>'):
     canvas.rect(2*cm, PAGE_HEIGHT-4.15*cm, PAGE_WIDTH-4*cm, 1.5*cm)
 
     canvas.setFont('Times-Bold', 16)
-    canvas.drawCentredString(PAGE_WIDTH/2.0, PAGE_HEIGHT-150, 'Technical Questionnaire')
+    canvas.drawCentredString(PAGE_WIDTH/2.0, PAGE_HEIGHT-150, type_)
 
     title_size=34
     canvas.setFont('Times-BoldItalic', title_size)
@@ -74,21 +75,21 @@ def tq_first_page(canvas, doc, doc_id='<doc id>', title='<title>'):
         current_y -= title_size
 
 
-    _print_footer(canvas, doc_id, doc.page)
+    _print_footer(canvas, "%s - %s" % (doc_id, type_), doc.page)
 
     canvas.restoreState()
     #canvas.showPage()
 
-def tq_later_pages(canvas, doc, doc_id="<doc_id>" ):
+def _later_pages(canvas, doc, doc_id="<doc_id>", type_="<type>" ):
     canvas.saveState()
-    _print_footer(canvas, doc_id, doc.page)
+    _print_footer(canvas, "%s - %s" % (doc_id, type_), doc.page)
     canvas.restoreState()
 
 def get_questionnaire_pdf(filename, doc_id, start_index=1):
     """ Method which writes to @filename a pdf representing the questionnaire of @doc_id
     By default the first system is numbered starting with 1, this can be overwritten with the @start_index parameter.
     Subsequent systems will have sequential numbers"""
-    P = Paragraph
+
 
     doc = db.get(doc_id)
     story = [Spacer(1,10*cm)]
@@ -106,7 +107,6 @@ def get_questionnaire_pdf(filename, doc_id, start_index=1):
     company_style = TableStyle([
                 ('GRID',    (0, 0), (-1, -1), 0.25, colors.black),
                 ('VALIGN',  (0, 0), (-1, -1), 'MIDDLE'),
-                #('ALIGN',   (2, 0), (3, -1), 'CENTER'),
                 ('BACKGROUND',  (0, 0), (-1, 0), colors.lightgrey),
         ])
 
@@ -134,7 +134,7 @@ def get_questionnaire_pdf(filename, doc_id, start_index=1):
                 data.append( [  "%d.%d.%d" % (start_index + sys, sec + 1, q + 1),
                                 P(question['question'], styleN),
                                 _get_type(question),
-                                str(question['answer'])
+                                str(question['answer'] or '')
                             ])
 
     table_styles = TableStyle([
@@ -151,7 +151,70 @@ def get_questionnaire_pdf(filename, doc_id, start_index=1):
     pdf = SimpleDocTemplate(filename)
     #title="Very very very very very long title which probably will not fit in one line and the behaviour is not known"
     #title="Short title"
-    pdf.build(story, onFirstPage=partial(tq_first_page, doc_id=doc_id, title=doc['title']), onLaterPages=partial(tq_later_pages, doc_id=doc_id))
+    _on_first_page = partial(_first_page, doc_id=doc_id, title=doc['title'], type_="Technical Questionnaire")
+    _on_later_pages = partial(_later_pages, doc_id=doc_id, type_="Technical Questionnaire")
+    pdf.build(story, onFirstPage=_on_first_page, onLaterPages=_on_later_pages)
 
     return pdf
+
+
+def get_document_pdf(filename, doc_id, start_index=1):
+    doc = db.get(doc_id)
+    story = [Spacer(1,10*cm)]
+
+    if doc.get('intro', None):
+        story.append(P('Scope of the invitationto Tender',styleH1))
+        story.append(P(doc['intro'], styleN))
+
+    outer_table = []
+    outer_h1s = []
+    outer_h2s = []
+    outer_h3s = []
+    outer_spans = []
+    H1 = partial(Paragraph, style=styleH1)
+    H2 = partial(Paragraph, style=styleH2)
+    H3 = partial(Paragraph, style=styleH3)
+    N = partial(Paragraph, style=styleN)
+
+    for sys in range(len(doc.get('systems',[]))):
+        system = doc['systems'][sys]
+        outer_table.append([
+                        H1("%d" % (start_index + sys)),
+                        H1(system['name'])
+                    ])
+        outer_h1s.append(start_index + sys)
+        if system['description']:
+            outer_table.append([system['description'], ''])
+            outer_spans.append(len(outer_table)-1)
+
+        inner_table=[]
+        for sec in range(len(system.get('sections',[]))):
+            section=system['sections'][sec]
+            outer_table.append([
+                        H2('%d.%d' % (start_index+sys, sec+1)),
+                        H2(section['header'])
+                    ])
+            outer_h2s.append(len(outer_table)-1)
+            if section['description']:
+                outer_table.append('',N(section['description']))
+
+            for q in range(len(section.get('questions',[]))):
+                question = section['questions'][q]
+                inner_table.append([
+                                N('%d.%d.%d' % (start_index+sys, sec+1, q+1)),
+                                N(question['tech_spec'] or 'No TS')
+                        ])
+            it = Table(inner_table, colWidths=[1.5*cm,10*cm])
+            outer_table.append(['',it])
+    table = Table(outer_table, colWidths=[2*cm,15*cm])
+    story.append(table)
+    pdf = SimpleDocTemplate(filename)
+    _on_first_page = partial(_first_page, doc_id=doc_id, title=doc['title'], type_="Technical Specifications")
+    _on_later_pages = partial(_later_pages, doc_id=doc_id, type_="Technical Specifications")
+    pdf.build(story, onFirstPage=_on_first_page, onLaterPages=_on_later_pages)
+
+    return pdf
+
+
+
 

@@ -16,6 +16,10 @@ body {
 	float:	none;
 }
 
+#content {
+    width: 1200px;
+}
+
 #footer {
     margin-top: 100px;
     text-align: center;
@@ -197,6 +201,58 @@ ul.errorlist+p {
     /*float: right;*/
 }
 
+#document_form > input[type=submit]{
+    width: 400px;
+    height: 50px;
+    margin-top: 50px;
+    margin-left: 350px;
+}
+
+/****** Contacts part ******/
+#contact_form {
+    width: 600px;
+    float: left;
+}
+
+#contact_form > p > label {
+    display: block;
+    float: left;
+    text-align: right;
+    text-decoration: underline;
+    width: 200px;
+    margin-right: 25px;
+}
+/* remove the underline from the empty label */
+#contact_form > p:last-child > label {
+    text-decoration: none;
+}
+#contacts {
+    margin-top: 50px;
+}
+
+#contacts > ul {
+    list-style-type: none;
+    margin: 0px;
+    padding: 0px;
+}
+#contacts > ul > li  {
+    margin: 0; /* 3px 3px 3px;  */
+    padding: 0.4em;
+    padding-left: 0.5em;
+    height: 18px;
+}
+
+#contacts > ul.sortable > li  {
+    margin: 0 3px 3px 3px;
+    padding: 0.4em;
+    padding-left: 0.5em;
+    height: 18px;
+}
+span.contact {
+    position: relative;
+    top: -1.0em;
+    margin-left: 1.5em;
+}
 /****** Systems Part ******/
 a.system, a.section, a.question {
     width: 75px;
@@ -227,8 +283,8 @@ span.system.name, span.section.name, span.question.name {
 
 #systems > ul {
     list-style-type: none;
-    margin: 0;
-    padding: 0;
+    margin: 0px;
+    padding: 0px;
 }
 #systems > ul > li, #sections > ul > li, #questions > ul > li  {
     margin: 0 3px 3px 3px;
@@ -299,7 +355,7 @@ input[type="text"][readonly="readonly"] {
 
 /**** Questionnaire Part ****/
 #questionnaire > div.system {
-    font-size: 200%
+    font-size: 200%;
 }
 
 #questionnaire > div.section {

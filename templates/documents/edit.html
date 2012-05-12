@@ -11,21 +11,21 @@
 {% block main %}
 	<form id="document_form" action="{{ extra_data.action }}" method="POST">{% csrf_token %}
 		{{ form.as_p }}
-            
+
 
         <div id="systems" class="ui-widget">
             <div class="ui-widget-header">Systems</div>
-            <ul class="ui-widget-content sortable">   
+            <ul class="ui-widget-content sortable">
             {% for s in extra_data.doc.systems %}
                 <li class="ui-state-default">
                     <span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
                     <span class="ui-widget-content system name">{{s.name}}</span>
-                    <a class="ui-widget-content system edit" 
+                    <a class="ui-widget-content system edit"
                         href="{% url documents.views.edit_system forloop.counter0 extra_data.doc.id %}"
                     >
                         Edit
                     </a>
-                    <a class="ui-widget-content system delete" 
+                    <a class="ui-widget-content system delete"
                         href="{% url documents.views.delete_system forloop.counter0 extra_data.doc.id %}"
                     >
                         Delete
@@ -35,10 +35,34 @@
                 <li class="ui-state-default">No System Defined</li>
             {% endfor %}
             </ul>
-        </div>        
+        </div>
+        <div id="contacts" class="ui-widget">
+            <div class="ui-widget-header">Contacts</div>
+            <ul class="ui-widget-content sortable">
+            {% for contact in extra_data.doc.contacts %}
+                <li class="ui-state-default">
+                    <span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
+                    <span class="ui-widget-content contact name">{{contact.name}} ({{contact.type_}})</span>
+                    <a class="ui-widget-content system edit"
+                        href="{% url documents.views.edit_contact forloop.counter0 extra_data.doc.id %}"
+                    >
+                        Edit
+                    </a>
+                    <a class="ui-widget-content system delete"
+                        href="{% url documents.views.delete_contact forloop.counter0 extra_data.doc.id %}"
+                    >
+                        Delete
+                    </a>
+                </li>
+            {% empty %}
+            {% endfor %}
+            </ul>
+        </div>
+        <input type="submit" value="Submit" /> </p>
         <div class="document actions">
+            <a href="{% url documents.views.add_contact extra_data.doc.id %}">Add Contact</a>
             <a href="{% url documents.views.add_system extra_data.doc.id %}">Add System</a>
         </div>
-		<p> <label>&nbsp;</label><input type="submit" value="Submit" /> </p>
+
 	</form>
 {% endblock main %}
