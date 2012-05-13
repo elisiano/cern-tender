@@ -17,7 +17,7 @@ from reportlab.lib.pagesizes import A4 as defaultPageSize
 PAGE_HEIGHT=defaultPageSize[1]; PAGE_WIDTH=defaultPageSize[0]
 
 from functools import partial
-
+import copy
 import pprint
 pp = pprint.PrettyPrinter(indent=4)
 #db = couchdbkit.ext.django.loading.get_db('documents')
@@ -161,60 +161,69 @@ def get_questionnaire_pdf(filename, doc_id, start_index=1):
 def get_document_pdf(filename, doc_id, start_index=1):
     doc = db.get(doc_id)
     story = [Spacer(1,10*cm)]
-
+    pp.pprint(dir(style.__getitem__))
     if doc.get('intro', None):
         story.append(P('Scope of the invitationto Tender',styleH1))
         story.append(P(doc['intro'], styleN))
 
-    outer_table = []
-    outer_h1s = []
-    outer_h2s = []
-    outer_h3s = []
-    outer_spans = []
+
     H1 = partial(Paragraph, style=styleH1)
     H2 = partial(Paragraph, style=styleH2)
     H3 = partial(Paragraph, style=styleH3)
     N = partial(Paragraph, style=styleN)
 
+    for s in [styleH1, styleH2, styleH3]:
+        s.bulletFontSize = s.fontSize
+
+    indent=20
+    styleH1L1 = ParagraphStyle(name='H1L1', parent=styleH1, leftIndent=indent, bulletIndent=indent)
+    styleH1L1.bulletFontSize = styleH1.bulletFontSize
+    H1L1 = partial(Paragraph,style=styleH1L1)
+
+    styleH2L1 = ParagraphStyle(name='H2L1', parent=styleH2, leftIndent=indent, bulletIndent=indent)
+    H2L1 = partial(Paragraph, style=styleH2L1)
+
+    styleNL1 = ParagraphStyle(name='NL1', parent=styleN, leftIndent=indent, bulletIndent=indent)
+    NL1 = partial(Paragraph, style=styleNL1)
+
+
+
     for sys in range(len(doc.get('systems',[]))):
         system = doc['systems'][sys]
-        outer_table.append([
-                        H1("%d" % (start_index + sys)),
-                        H1(system['name'])
-                    ])
-        outer_h1s.append(start_index + sys)
-        if system['description']:
-            outer_table.append([system['description'], ''])
-            outer_spans.append(len(outer_table)-1)
 
-        inner_table=[]
+        bt = "%d" % (start_index + sys)
+        story.append(Spacer(1,cm))
+        story.append(
+                        H1(system['name'], bulletText = bt )
+                    )
+        if system['description']:
+            story.append(N(system['description']))
+
+
+        # due to this http://two.pairlist.net/pipermail/reportlab-users/2008-January/006676.html
+        # the use of a table is not suitable. I will build the list with bulleted paragraphs
         for sec in range(len(system.get('sections',[]))):
+
             section=system['sections'][sec]
-            outer_table.append([
-                        H2('%d.%d' % (start_index+sys, sec+1)),
-                        H2(section['header'])
-                    ])
-            outer_h2s.append(len(outer_table)-1)
+            bt = '%d.%d' % (start_index + sys, sec+1)
+
+            story.append(
+                        H2(section['header'], bulletText=bt)
+                    )
+
             if section['description']:
-                outer_table.append('',N(section['description']))
+                story.append(N(section['description']))
 
             for q in range(len(section.get('questions',[]))):
                 question = section['questions'][q]
-                inner_table.append([
-                                N('%d.%d.%d' % (start_index+sys, sec+1, q+1)),
-                                N(question['tech_spec'] or 'No TS')
-                        ])
-            it = Table(inner_table, colWidths=[1.5*cm,10*cm])
-            outer_table.append(['',it])
-    table = Table(outer_table, colWidths=[2*cm,15*cm])
-    story.append(table)
+                bt = "%d.%d.%d" % (start_index + sys, sec+q, q+1)
+
+                story.append(NL1(question['tech_spec'], bulletText=bt))
+
+
     pdf = SimpleDocTemplate(filename)
     _on_first_page = partial(_first_page, doc_id=doc_id, title=doc['title'], type_="Technical Specifications")
     _on_later_pages = partial(_later_pages, doc_id=doc_id, type_="Technical Specifications")
     pdf.build(story, onFirstPage=_on_first_page, onLaterPages=_on_later_pages)
 
     return pdf
-
-
-
-
