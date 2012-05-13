@@ -161,12 +161,11 @@ def get_questionnaire_pdf(filename, doc_id, start_index=1):
 def get_document_pdf(filename, doc_id, start_index=1):
     doc = db.get(doc_id)
     story = [Spacer(1,10*cm)]
-    pp.pprint(dir(style.__getitem__))
     if doc.get('intro', None):
         story.append(P('Scope of the invitationto Tender',styleH1))
         story.append(P(doc['intro'], styleN))
 
-
+    styleN.alignment = TA_JUSTIFY
     H1 = partial(Paragraph, style=styleH1)
     H2 = partial(Paragraph, style=styleH2)
     H3 = partial(Paragraph, style=styleH3)
@@ -219,6 +218,37 @@ def get_document_pdf(filename, doc_id, start_index=1):
                 bt = "%d.%d.%d" % (start_index + sys, sec+q, q+1)
 
                 story.append(NL1(question['tech_spec'], bulletText=bt))
+
+    contacts_per_row=3
+    data=[]
+    stack = []
+    _cs = copy.deepcopy(doc['contacts'])
+    table_data = []
+    # let's pad the table
+    while len(_cs) % contacts_per_row != 0:
+        print "appending empty dict"
+        _cs.append(dict({u'type_':'', u'name':'', u'address':'',u'tel':'',u'fax':'', u'email':''}))
+    pp.pprint(_cs)
+    for ci in range(len(_cs)):
+        stack.append(_cs[ci])
+        if len(stack) == contacts_per_row:
+            table_data.append([ u'']       + [c['type_']+':' if c['type_'] else '' for c in stack])
+            table_data.append([u'Name']    + [c['name'] for c in stack])
+            table_data.append([u'Address'] + [c['address'].replace('\r','') for c in stack])
+            table_data.append([u'Tel']     + [c['tel'] for c in stack])
+            table_data.append([u'Fax']     + [c['fax'] for c in stack])
+            table_data.append([u'E-mail']  + [c['email'] for c in stack])
+            table_data.append([u'']*(contacts_per_row+1))
+            stack=[]
+
+#    pp.pprint( table_data )
+    table_style=TableStyle([('VALIGN',(0,0), (-1,-1), 'TOP'),
+                            ('ALIGN', (0,0), (0,-1), 'LEFT')
+                        ])
+    table=Table(table_data, colWidths=[2.5*cm]+[4*cm]*3, style=table_style)
+    story.append(Spacer(1,cm))
+    story.append(H1('Contacts'))
+    story.append(table)
 
 
     pdf = SimpleDocTemplate(filename)
