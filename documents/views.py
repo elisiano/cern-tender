@@ -37,6 +37,25 @@ def new(request):
                               {'form': form, 'extra_data': {}},
                               context_instance=RequestContext(request))
 
+def clone(request, doc_id):
+    form = forms.NewDocumentForm(request.POST or None, auto_id=False)
+    if form.is_valid():
+        doc = db.get(doc_id)
+        doc['_id'] = form.cleaned_data['_id']
+        del doc['_rev']
+        result = db.save_doc(doc)
+        if result['ok']:
+            ahref= reverse('documents.views.view', args=(doc_id,))
+
+            return message('Document Saved',
+                           'The document <a href="%s">%s</a> has been saved' % (ahref, result['id']))
+        else:
+            return message('Error',
+                'Something went wrong while saving "%s"' % result['id'])
+
+    return render_to_response('documents/new_form.html',
+                              {'form': form, 'extra_data': {}},
+                              context_instance=RequestContext(request))
 
 def view(request, doc_id):
     doc = db.get(doc_id)
