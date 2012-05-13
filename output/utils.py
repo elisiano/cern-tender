@@ -220,15 +220,12 @@ def get_document_pdf(filename, doc_id, start_index=1):
                 story.append(NL1(question['tech_spec'], bulletText=bt))
 
     contacts_per_row=3
-    data=[]
-    stack = []
     _cs = copy.deepcopy(doc['contacts'])
     table_data = []
     # let's pad the table
     while len(_cs) % contacts_per_row != 0:
-        print "appending empty dict"
         _cs.append(dict({u'type_':'', u'name':'', u'address':'',u'tel':'',u'fax':'', u'email':''}))
-    pp.pprint(_cs)
+    stack = []
     for ci in range(len(_cs)):
         stack.append(_cs[ci])
         if len(stack) == contacts_per_row:
@@ -241,11 +238,12 @@ def get_document_pdf(filename, doc_id, start_index=1):
             table_data.append([u'']*(contacts_per_row+1))
             stack=[]
 
-#    pp.pprint( table_data )
     table_style=TableStyle([('VALIGN',(0,0), (-1,-1), 'TOP'),
-                            ('ALIGN', (0,0), (0,-1), 'LEFT')
+                            ('ALIGN', (0,0), (0,-1), 'LEFT'),
+                            ('ALIGN', (0,0), (0,-1), 'RIGHT'),
+                            #('GRID',(0,0), (-1,-1), 0.25, colors.black)
                         ])
-    table=Table(table_data, colWidths=[2.5*cm]+[4*cm]*3, style=table_style)
+    table=Table(table_data, colWidths=[2.5*cm]+[4.5*cm]*contacts_per_row, style=table_style)
     story.append(Spacer(1,cm))
     story.append(H1('Contacts'))
     story.append(table)
