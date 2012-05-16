@@ -85,7 +85,7 @@ def _later_pages(canvas, doc, doc_id="<doc_id>", type_="<type>" ):
     _print_footer(canvas, "%s - %s" % (doc_id, type_), doc.page)
     canvas.restoreState()
 
-def get_questionnaire_pdf(filename, doc_id, start_index=1):
+def get_questionnaire_pdf(filename, doc_id, start_index=1, print_answers=True):
     """ Method which writes to @filename a pdf representing the questionnaire of @doc_id
     By default the first system is numbered starting with 1, this can be overwritten with the @start_index parameter.
     Subsequent systems will have sequential numbers"""
@@ -134,7 +134,7 @@ def get_questionnaire_pdf(filename, doc_id, start_index=1):
                 data.append( [  "%d.%d.%d" % (start_index + sys, sec + 1, q + 1),
                                 P(question['question'], styleN),
                                 _get_type(question),
-                                str(question['answer'] or '')
+                                (str(question['answer'] or '') if print_answers else '')
                             ])
 
     table_styles = TableStyle([
@@ -158,11 +158,108 @@ def get_questionnaire_pdf(filename, doc_id, start_index=1):
     return pdf
 
 
+import xlwt 
+def _get_xls_formula(question, answer_cell_reference):
+    if question['doc_type'] == 'QuestionFromList':
+        formula="IF(OR("
+        tmp_conds=[]
+        for k in question['answer_data']:
+#            tmp_conds.append('CELL("contents",%s)=="%s"' % (answer_cell_reference, k))
+            tmp_conds.append('%s="%s"' % (answer_cell_reference, k))
+        formula += ','.join(tmp_conds)
+        formula += "),TRUE,FALSE)"
+        return xlwt.Formula(formula)
+    elif question['doc_type'].find('Range') > -1:
+        formula="AND(%s >= %s, %s <= %s)" % ( answer_cell_reference, question['min_'],
+                                              answer_cell_reference, question['max_'])
+        return xlwt.Formula(formula)
+
+    elif questio['doc_type'] == 'QuestionFreeText':
+        formula = 'IF(%s="",FALSE,TRUE)' % answer_cell_reference
+        return xlwt.Formula(formula)
+        
+    else:
+        return ""
+        
+def get_questionnaire_xls(filename, doc_id, start_index=1, print_answers=True):
+    doc=db.get(doc_id)
+    wb = xlwt.Workbook()
+    sheet = wb.add_sheet('Technical Questionnaire')
+
+    styleH1 = xlwt.XFStyle()
+    fontH1 = xlwt.Font()
+    fontH1.bold = True
+    fontH1.height = 250
+    #font.colour_index=
+    styleH1.font = fontH1
+    
+    styleH2 = xlwt.XFStyle()
+    fontH2 = xlwt.Font()
+    fontH2.height = 225
+    fontH2.bold = True
+    styleH2.font = fontH2
+    row = 0
+    col = 0
+    sheet.write(row,col+1,"Technical Questionaire for %s" % doc_id, styleH1)
+    row+=1
+    sheet.write(row, col  ,"Ref", styleH2)
+    sheet.write(row, col+1,"System/Section/Question", styleH2)
+    sheet.write(row, col+2,"Type", styleH2)
+    sheet.write(row, col+3,"Answer", styleH2)
+    sheet.write(row, col+4,"Valid?", styleH2)
+    row += 2
+    
+    # http://www.youlikeprogramming.com/2011/04/examples-generating-excel-documents-using-pythons-xlwt/
+    align_center = xlwt.Alignment()
+    align_center.horz = xlwt.Alignment.HORZ_CENTER
+    style_centered = xlwt.XFStyle()
+    style_centered.alignment = align_center
+
+    background = xlwt.Pattern()
+    background.pattern = xlwt.Pattern.SOLID_PATTERN
+    background.pattern_fore_colour = 0x16 #light gray
+    
+    borders = xlwt.Borders()
+    borders.left = borders.right = borders.top = borders.bottom = xlwt.Borders.THIN
+    
+    styleH1.pattern = background
+    styleH2.pattern = background
+    styleH1.borders = borders
+    styleH2.borders = borders    
+#    styleH1 = xlwt.easyxf('font: colour_index black, bold on; pattern: fore_colour grey25, pattern solid')
+
+    for sys in range(len(doc.get('systems', []))):
+        system = doc['systems'][sys]
+        sheet.write(row, col, '%d' % (start_index + sys), styleH1)
+        sheet.write_merge(row, row, col+1, col+4, system['name'], styleH1)
+        row += 1    
+        for sec in range(len(system.get('sections',[]))):
+            section = system['sections'][sec]
+            sheet.write(row, col, '%d.%d' % (start_index + sys, sec + 1), styleH2)        
+            sheet.write_merge(row, row, col+1, col+4, section['header'], styleH2)
+            row += 1
+            
+            for q in range(len(section.get('questions', []))):
+                question = section['questions'][q]
+                sheet.write(row, col, "%d.%d.%d" % (start_index + sys, sec + 1, q + 1))
+                sheet.write(row, col+1, question['question'])
+                sheet.write(row, col+2, _get_type(question))
+                sheet.write(row, col+3, str(question['answer'] or '') if print_answers else '', style_centered)
+                sheet.write(row, col+4, _get_xls_formula(question, xlwt.Utils.rowcol_to_cell(row, col+3)))
+                row += 1
+    
+    sheet.col(col).width = 2000
+    sheet.col(col+1).width = 20000
+    sheet.col(col+2).width = 6500
+    
+    wb.save(filename)
+
+
 def get_document_pdf(filename, doc_id, start_index=1):
     doc = db.get(doc_id)
     story = [Spacer(1,10*cm)]
     if doc.get('intro', None):
-        story.append(P('Scope of the invitationto Tender',styleH1))
+        story.append(P(doc['intro_header'] or 'Scope of the invitation to Tender',styleH1))
         story.append(P(doc['intro'], styleN))
 
     styleN.alignment = TA_JUSTIFY
@@ -215,7 +312,7 @@ def get_document_pdf(filename, doc_id, start_index=1):
 
             for q in range(len(section.get('questions',[]))):
                 question = section['questions'][q]
-                bt = "%d.%d.%d" % (start_index + sys, sec+q, q+1)
+                bt = "%d.%d.%d" % (start_index + sys, sec+1, q+1)
 
                 story.append(NL1(question['tech_spec'], bulletText=bt))
 

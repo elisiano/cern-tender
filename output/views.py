@@ -33,8 +33,24 @@ def questionnaire_pdf(request, doc_id):
     response = HttpResponse(mimetype='application/pdf')
     response['Content-Disposition'] = 'filename=%s-techq.pdf' % _clean_filename(doc_id)
 
-    start_idx = request.GET.get('start_index',1)
-    pdf = utils.get_questionnaire_pdf(response, doc_id, int(start_idx))
+    start_idx = int(request.GET.get('start_index',1))
+    print_answers = bool(request.GET.get('print_answers',False))
+    pdf = utils.get_questionnaire_pdf(response, doc_id, start_index=start_idx, print_answers=print_answers)
+    return response
+    
+def questionnaire_xls(request, doc_id):
+    doc = None
+    try:
+        doc = db.get(doc_id)
+    except Exception, e:
+        return message('Error','Error getting document %s: %s' % (doc_id, e))
+
+    response = HttpResponse(mimetype='application/msexcel')
+    response['Content-Disposition'] = 'filename=%s-techq.xls' % _clean_filename(doc_id)
+
+    start_idx = int(request.GET.get('start_index',1))
+    print_answers = bool(request.GET.get('print_answers',False))
+    xls = utils.get_questionnaire_xls(response, doc_id, start_index=start_idx, print_answers=print_answers)
     return response
 
 def document_pdf(request, doc_id):
@@ -47,6 +63,6 @@ def document_pdf(request, doc_id):
     response = HttpResponse(mimetype='application/pdf')
     response['Content-Disposition'] = 'filename=%s.pdf' % _clean_filename(doc_id)
 
-    start_idx = request.GET.get('start_index',1)
-    pdf = utils.get_document_pdf(response, doc_id, int(start_idx))
+    start_idx = int(request.GET.get('start_index',1))
+    pdf = utils.get_document_pdf(response, doc_id, start_index=start_idx)
     return response
