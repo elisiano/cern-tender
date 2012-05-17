@@ -107,6 +107,7 @@ def edit_document_root(request, doc_id):
             del doc['id']
             del doc['rev']
             doc['intro'] = form.cleaned_data['intro']
+            doc['intro_header'] = form.cleaned_data['intro_header']
             doc['questionnaire_intro'] = form.cleaned_data['questionnaire_intro']
             doc['title'] = form.cleaned_data['title']
             # the systems must be reordered

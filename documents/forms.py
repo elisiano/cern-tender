@@ -35,8 +35,11 @@ class NewDocumentForm(DocBaseForm):
 
 
 class EditDocumentRootForm(DocBaseForm):
+    intro_header = forms.CharField(label="Introduction Header", required=False)
     intro = forms.CharField(widget=forms.Textarea(attrs={'class':'ui-widget ui-corner-all','rows':30, 'cols':60}),
                             label="Introduction", required=False)
+
+
     questionnaire_intro = forms.CharField(widget=forms.Textarea(attrs={'class':'ui-widget ui-corner-all','rows':30, 'cols':60}),
                             label="Questionnaire Introduction", required=False)
     title = forms.CharField()

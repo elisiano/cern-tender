@@ -158,7 +158,7 @@ def get_questionnaire_pdf(filename, doc_id, start_index=1, print_answers=True):
     return pdf
 
 
-import xlwt 
+import xlwt
 def _get_xls_formula(question, answer_cell_reference):
     if question['doc_type'] == 'QuestionFromList':
         formula="IF(OR("
@@ -177,81 +177,76 @@ def _get_xls_formula(question, answer_cell_reference):
     elif questio['doc_type'] == 'QuestionFreeText':
         formula = 'IF(%s="",FALSE,TRUE)' % answer_cell_reference
         return xlwt.Formula(formula)
-        
+
     else:
         return ""
-        
+
 def get_questionnaire_xls(filename, doc_id, start_index=1, print_answers=True):
     doc=db.get(doc_id)
     wb = xlwt.Workbook()
     sheet = wb.add_sheet('Technical Questionnaire')
 
-    styleH1 = xlwt.XFStyle()
-    fontH1 = xlwt.Font()
-    fontH1.bold = True
-    fontH1.height = 250
-    #font.colour_index=
-    styleH1.font = fontH1
-    
-    styleH2 = xlwt.XFStyle()
-    fontH2 = xlwt.Font()
-    fontH2.height = 225
-    fontH2.bold = True
-    styleH2.font = fontH2
+
+    styleH1 = xlwt.easyxf('font: name Calibri, height 300, bold on; align: wrap on, vert centre')
+    styleH2 = xlwt.easyxf('font: name Caliri, height 275, bold on; align: wrap on, vert centre')
+    styleN = xlwt.easyxf('font: name Calibri, height 275; align: wrap on, vert centre')
+
+    style_centered = xlwt.easyxf('font: name Caliri, height 250; align: wrap on, vert centre, horiz center')
+
     row = 0
     col = 0
     sheet.write(row,col+1,"Technical Questionaire for %s" % doc_id, styleH1)
     row+=1
+
+    sheet.row(row).height=3333
+    sheet.row(row).height_mismatch=True
+    sheet.write_merge(row,row,col,col+4,doc['questionnaire_intro'],styleH2)
+    row +=2
+
     sheet.write(row, col  ,"Ref", styleH2)
     sheet.write(row, col+1,"System/Section/Question", styleH2)
     sheet.write(row, col+2,"Type", styleH2)
     sheet.write(row, col+3,"Answer", styleH2)
     sheet.write(row, col+4,"Valid?", styleH2)
     row += 2
-    
-    # http://www.youlikeprogramming.com/2011/04/examples-generating-excel-documents-using-pythons-xlwt/
-    align_center = xlwt.Alignment()
-    align_center.horz = xlwt.Alignment.HORZ_CENTER
-    style_centered = xlwt.XFStyle()
-    style_centered.alignment = align_center
 
     background = xlwt.Pattern()
     background.pattern = xlwt.Pattern.SOLID_PATTERN
     background.pattern_fore_colour = 0x16 #light gray
-    
+
     borders = xlwt.Borders()
     borders.left = borders.right = borders.top = borders.bottom = xlwt.Borders.THIN
-    
+
     styleH1.pattern = background
     styleH2.pattern = background
     styleH1.borders = borders
-    styleH2.borders = borders    
-#    styleH1 = xlwt.easyxf('font: colour_index black, bold on; pattern: fore_colour grey25, pattern solid')
+    styleH2.borders = borders
 
     for sys in range(len(doc.get('systems', []))):
         system = doc['systems'][sys]
         sheet.write(row, col, '%d' % (start_index + sys), styleH1)
         sheet.write_merge(row, row, col+1, col+4, system['name'], styleH1)
-        row += 1    
+        row += 1
         for sec in range(len(system.get('sections',[]))):
             section = system['sections'][sec]
-            sheet.write(row, col, '%d.%d' % (start_index + sys, sec + 1), styleH2)        
+            sheet.write(row, col, '%d.%d' % (start_index + sys, sec + 1), styleH2)
             sheet.write_merge(row, row, col+1, col+4, section['header'], styleH2)
             row += 1
-            
+
             for q in range(len(section.get('questions', []))):
                 question = section['questions'][q]
-                sheet.write(row, col, "%d.%d.%d" % (start_index + sys, sec + 1, q + 1))
-                sheet.write(row, col+1, question['question'])
-                sheet.write(row, col+2, _get_type(question))
+                sheet.write(row, col, "%d.%d.%d" % (start_index + sys, sec + 1, q + 1), styleN)
+                sheet.write(row, col+1, question['question'], styleN)
+                sheet.write(row, col+2, _get_type(question), style_centered)
                 sheet.write(row, col+3, str(question['answer'] or '') if print_answers else '', style_centered)
-                sheet.write(row, col+4, _get_xls_formula(question, xlwt.Utils.rowcol_to_cell(row, col+3)))
+                sheet.write(row, col+4, _get_xls_formula(question, xlwt.Utils.rowcol_to_cell(row, col+3)), styleN)
                 row += 1
-    
+
     sheet.col(col).width = 2000
     sheet.col(col+1).width = 20000
-    sheet.col(col+2).width = 6500
-    
+    sheet.col(col+2).width = 7500
+    sheet.row_default_height = 510
+
     wb.save(filename)
 
 
@@ -271,7 +266,7 @@ def get_document_pdf(filename, doc_id, start_index=1):
     for s in [styleH1, styleH2, styleH3]:
         s.bulletFontSize = s.fontSize
 
-    indent=20
+    indent=30
     styleH1L1 = ParagraphStyle(name='H1L1', parent=styleH1, leftIndent=indent, bulletIndent=indent)
     styleH1L1.bulletFontSize = styleH1.bulletFontSize
     H1L1 = partial(Paragraph,style=styleH1L1)
@@ -279,7 +274,7 @@ def get_document_pdf(filename, doc_id, start_index=1):
     styleH2L1 = ParagraphStyle(name='H2L1', parent=styleH2, leftIndent=indent, bulletIndent=indent)
     H2L1 = partial(Paragraph, style=styleH2L1)
 
-    styleNL1 = ParagraphStyle(name='NL1', parent=styleN, leftIndent=indent, bulletIndent=indent)
+    styleNL1 = ParagraphStyle(name='NL1', parent=styleN, leftIndent=indent*2, bulletIndent=indent, spaceAfter=5)
     NL1 = partial(Paragraph, style=styleNL1)
 
 
