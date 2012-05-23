@@ -347,3 +347,21 @@ def get_document_pdf(filename, doc_id, start_index=1):
     pdf.build(story, onFirstPage=_on_first_page, onLaterPages=_on_later_pages)
 
     return pdf
+
+
+import docx
+def get_document_docx(filename, doc_id, start_index=1):
+    ### Followed the example of the author of the library
+    relationships = docx.relationshiplist()
+    document = docx.newdocument()
+    docbody = document.xpath('/w:document/w:body', namespaces=docx.nsprefixes)[0]
+    docbody.append(docx.heading('''Invitation to tender %s''' % doc_id,1)  )
+
+    # Create our properties, contenttypes, and other support files
+    coreprops = docx.coreproperties(title='Invitation to tender %s' % doc_id,subject='IT %s Technica Specifications',creator='EliianoPetrini',keywords=['tender','Office Open XML','Word','%s' % doc_id])
+    appprops = docx.appproperties()
+    contenttypes = docx.contenttypes()
+    websettings = docx.websettings()
+    wordrelationships = docx.wordrelationships(relationships)
+    docx.savedocx(document,coreprops,appprops,contenttypes,websettings,wordrelationships,filename)
+    
