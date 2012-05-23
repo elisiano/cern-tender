@@ -66,3 +66,17 @@ def document_pdf(request, doc_id):
     start_idx = int(request.GET.get('start_index',1))
     pdf = utils.get_document_pdf(response, doc_id, start_index=start_idx)
     return response
+    
+def document_docx(request, doc_id):
+    doc = None
+    try:
+        doc = db.get(doc_id)
+    except Exception, e:
+        return message('Error','Error getting document %s: %s' % (doc_id, e))
+
+    response = HttpResponse(mimetype='application/msword')
+    response['Content-Disposition'] = 'filename=%s.docx' % _clean_filename(doc_id)
+
+    start_idx = int(request.GET.get('start_index',1))
+    docx = utils.get_document_docx(response, doc_id, start_index=start_idx)
+    return response
