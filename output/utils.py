@@ -354,16 +354,38 @@ import tempfile
 import os
 def get_document_docx(filename, doc_id, start_index=1):
     """filename is a file like object (like an HttpResponse)"""
+    
+    doc=db.get(doc_id)
+    
+    H1 = partial(docx.heading,headinglevel=1)
+    H2 = partial(docx.heading,headinglevel=2)
+    N = partial(docx.paragraph,style='')
+    
     ### Followed the example of the author of the library
     relationships = docx.relationshiplist()
     document = docx.newdocument()
     docbody = document.xpath('/w:document/w:body', namespaces=docx.nsprefixes)[0]
-    docbody.append(docx.heading('''Invitation to tender %s''' % doc_id,1)  )
 
-    H1 = partial(docx.heading,headinglevel=1)
-    H2 = partial(docx.heading,headinglevel=2)
-    N = partial(docx.paragraph,style='')
-    story = docbody    
+    docbody.append(docx.paragraph([('CERN - European Organisation for Nuclear Research','b')],jc='center'))
+    docbody.append(docx.paragraph([('1211 Geneva 23, Switzerland', 'b')],jc='center'))
+
+
+    ### Unable to center the table, commending it for no
+#    docbody.append(docx.table(
+#                            [[docx.paragraph([('Invitation to tender %s' % doc_id,'b')],jc='center')]], 
+#                            heading=False,
+#                            borders={'all':{'color':'auto', 'size':'1', 'val':'single'}},
+#                                
+#                            ))
+
+    story = docbody
+    story.append(N(''))
+    story.append(N(''))
+    story.append(docx.paragraph([('Invitation to tender %s' % doc_id,'bu')],jc='center'))
+    story.append(N(''))
+    story.append(docx.paragraph([('Technical Specifications','bi')],jc='center'))
+    story.append(N(''))
+
     
     if doc.get('intro', None):
         story.append(H1(doc['intro_header'] or 'Scope of the invitaion to Tender'))
@@ -373,7 +395,7 @@ def get_document_docx(filename, doc_id, start_index=1):
         system = doc['systems'][sys]
         bt = "%d" % (start_index + sys)
         story.append(N('\n\n'))
-        story.append(N('%d. %s', % (bt, system['name'])))
+        story.append(H1('%s. %s' % (bt, system['name'])))
 
         if system['description']:
             story.append(N(system['description']))
@@ -384,7 +406,7 @@ def get_document_docx(filename, doc_id, start_index=1):
             bt = '%d.%d' % (start_index + sys, sec+1)
 
             story.append(
-                        H2('%s. %s' %(bt, section['header']))
+                        H2('%s. %s' % (bt, section['header']))
                     )
 
             if section['description']:
@@ -396,7 +418,7 @@ def get_document_docx(filename, doc_id, start_index=1):
 
                 story.append(N('\t%s. %s' % (bt, question['tech_spec'])))
                 
-        contacts_per_row=3
+    contacts_per_row=3
     _cs = copy.deepcopy(doc['contacts'])
     table_data = []
     # let's pad the table
@@ -414,6 +436,7 @@ def get_document_docx(filename, doc_id, start_index=1):
             table_data.append([u'E-mail']  + [c['email'] for c in stack])
             table_data.append([u'']*(contacts_per_row+1))
             stack=[]
+    story.append(N(''))
     story.append(docx.table(table_data, heading=False))
     
     # Create our properties, contenttypes, and other support files

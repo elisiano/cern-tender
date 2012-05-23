@@ -74,7 +74,7 @@ def document_docx(request, doc_id):
     except Exception, e:
         return message('Error','Error getting document %s: %s' % (doc_id, e))
 
-    response = HttpResponse(mimetype='application/msword')
+    response = HttpResponse(mimetype='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
     response['Content-Disposition'] = 'filename=%s.docx' % _clean_filename(doc_id)
 
     start_idx = int(request.GET.get('start_index',1))
