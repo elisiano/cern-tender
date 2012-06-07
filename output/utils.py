@@ -85,6 +85,21 @@ def _later_pages(canvas, doc, doc_id="<doc_id>", type_="<type>" ):
     _print_footer(canvas, "%s - %s" % (doc_id, type_), doc.page)
     canvas.restoreState()
 
+
+def get_category_tag_index(doc_id, start_index=1):
+    idx = {}
+    doc = db.get(doc_id)
+    for sys in range(len(doc.get('systems', []))):
+        system = doc['systems'][sys]
+        for sec in range(len(system.get('sections',[]))):
+            section = system['sections'][sec]
+            for q in range(len(section.get('questions', []))):
+                question = section['questions'][q]
+                idx.setdefault(q['category'],{})[q['tag']] = "%d.%d.%d" % (start_index + sys, sec + 1, q + 1)
+
+    return idx
+
+
 def get_questionnaire_pdf(filename, doc_id, start_index=1, print_answers=True):
     """ Method which writes to @filename a pdf representing the questionnaire of @doc_id
     By default the first system is numbered starting with 1, this can be overwritten with the @start_index parameter.
@@ -116,7 +131,7 @@ def get_questionnaire_pdf(filename, doc_id, start_index=1, print_answers=True):
 
     data = [[ 'Ref', 'Header/Question', 'Type', 'Answer' ]]
 
-    # this lis will contain the indeces of the rows which shoud have a differnt
+    # this lis will contain the indices of the rows which should have a different
     # formatting (headers)
     headers_rows = []
     headers_rows.append(len(data)-1)
