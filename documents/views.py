@@ -278,7 +278,7 @@ def edit_system(request, system_idx, doc_id):
                 line = line.strip('\r\n')
                 if line:
                     rules.append(line)
-            print "Converted rules:", pp.pprint(rules)
+            #print "Converted rules:", pp.pprint(rules)
             doc['systems'][sys_idx]['rules'] = rules
 
             result = db.save_doc(doc)
