@@ -5,7 +5,7 @@
 {% endblock extra_headers %}
 
 {% block pagetitle %}Edit System{% endblock %}
-{% block title %}Edit System in {{extra_data.doc.id}}{% endblock %}
+{% block title %}Edit System in <a href="{% url documents.views.view extra_data.doc.id %}">{{extra_data.doc.id}}</a>{% endblock %}
 
 {% block main %}
     <form id="edit_system" action="{{ extra_data.action }}" method="POST">{% csrf_token %}
@@ -38,6 +38,7 @@
         </div>
         <div class="ui-widget system actions">
             <a class="ui-widget-content ui-state-default" href="{% url documents.views.add_system_section extra_data.system.index extra_data.doc.id %}">Add Section</a>
+            <a class="ui-widget-content ui-state-default" href="{% url documents.views.view extra_data.doc.id %}">Back to root</a>
         </div>
         <p> <label>&nbsp;</label><input class="ui-widget-content ui-state-default" type="submit" value="Submit" /> </p>
     </form>

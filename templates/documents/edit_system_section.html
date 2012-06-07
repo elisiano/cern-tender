@@ -38,6 +38,8 @@
 
         <div class="ui-widget question actions">
             <a class="ui-widget-content ui-state-default" href="{% url documents.views.add_system_section_question extra_data.section.index extra_data.system.index extra_data.doc.id %}">Add Question</a>
+            <a class="ui-widget-content ui-state-default" href="{% url documents.views.view extra_data.doc.id %}">Back to root</a>
+
         </div>
         <p> <label>&nbsp;</label><input class="ui-widget-content ui-state-default" type="submit" value="Submit" /> </p>
     </form>

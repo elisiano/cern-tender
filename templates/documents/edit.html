@@ -62,6 +62,8 @@
         <div class="document actions">
             <a href="{% url documents.views.add_contact extra_data.doc.id %}">Add Contact</a>
             <a href="{% url documents.views.add_system extra_data.doc.id %}">Add System</a>
+            <a class="ui-widget-content ui-state-default" href="{% url documents.views.view extra_data.doc.id %}">Back to root</a>
+
         </div>
 
 	</form>
