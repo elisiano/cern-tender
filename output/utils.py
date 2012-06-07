@@ -255,7 +255,15 @@ def get_document_pdf(filename, doc_id, start_index=1):
     story = [Spacer(1,10*cm)]
     if doc.get('intro', None):
         story.append(P(doc['intro_header'] or 'Scope of the invitation to Tender',styleH1))
-        story.append(P(doc['intro'], styleN))
+        import copy
+        styleP = copy.deepcopy(styleN)
+        styleP.firstLineIndent=20
+        styleP.alignment = TA_JUSTIFY
+        for p in doc['intro'].replace('\r','').split('\n'):
+            if not p: # empty line:
+                story.append(Spacer(1,12))
+            else:
+                story.append(P(p, styleP))
 
     styleN.alignment = TA_JUSTIFY
     H1 = partial(Paragraph, style=styleH1)
