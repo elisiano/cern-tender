@@ -1,5 +1,6 @@
 import couchdbkit
 import textwrap
+import re
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib import colors
 from reportlab.lib.units import cm
@@ -95,10 +96,37 @@ def get_category_tag_index(doc_id, start_index=1):
             section = system['sections'][sec]
             for q in range(len(section.get('questions', []))):
                 question = section['questions'][q]
-                idx.setdefault(q['category'],{})[q['tag']] = "%d.%d.%d" % (start_index + sys, sec + 1, q + 1)
+                idx.setdefault(question['category'],{})[question['tag']] = "%d.%d.%d" % (start_index + sys, sec + 1, q + 1)
 
     return idx
 
+def get_doc_copy_with_references(doc_id, start_index=1, qproperties=['question', 'tech_spec']):
+    """
+    Returns a copy of the document with the references substituted
+    It checks each question of the document. If the properties (found in @qproperties) match the pattern {% category.tag %}
+    then the value of the pattern is substituted with the proper reference number
+
+    WARNING: if multiple questions with the same category/tag are defined, all the references will point to the last definition
+    """
+    reference_pattern = re.compile(r'\{\%\s*(?P<category>.*?)\.(?P<tag>[^%\s]*?)\s*\%\}')
+    references = get_category_tag_index(doc_id, start_index)
+    doc = db.get(doc_id)
+
+    for sys in range(len(doc.get('systems', []))):
+        system = doc['systems'][sys]
+        for sec in range(len(system.get('sections',[]))):
+            section = system['sections'][sec]
+            for q in range(len(section.get('questions', []))):
+                question = section['questions'][q]
+
+                ### Replacements in question['question'] and question['tech_spec']
+                for prop in qproperties:
+                    p = question[prop]
+                    match = reference_pattern.search(p)
+                    while match:
+                        question[prop]= p[0:match.start()] + references[match.group('category')][match.group('tag')] + p[match.end():]
+                        match = reference_pattern.search(p)
+    return doc
 
 def get_questionnaire_pdf(filename, doc_id, start_index=1, print_answers=True):
     """ Method which writes to @filename a pdf representing the questionnaire of @doc_id
@@ -106,7 +134,7 @@ def get_questionnaire_pdf(filename, doc_id, start_index=1, print_answers=True):
     Subsequent systems will have sequential numbers"""
 
 
-    doc = db.get(doc_id)
+    doc = get_doc_copy_with_references(doc_id, start_index=1)
     story = [Spacer(1,10*cm)]
     story.append( P(doc['questionnaire_intro'],
                   ParagraphStyle( name='ItalicJustified',
@@ -135,7 +163,6 @@ def get_questionnaire_pdf(filename, doc_id, start_index=1, print_answers=True):
     # formatting (headers)
     headers_rows = []
     headers_rows.append(len(data)-1)
-
     for sys in range(len(doc.get('systems', []))):
         system = doc['systems'][sys]
         data.append(['%s' % (start_index + sys), P(system['name'], styleH2), '', ''])
@@ -197,7 +224,7 @@ def _get_xls_formula(question, answer_cell_reference):
         return ""
 
 def get_questionnaire_xls(filename, doc_id, start_index=1, print_answers=True):
-    doc=db.get(doc_id)
+    doc = get_doc_copy_with_references(doc_id, start_index=1)
     wb = xlwt.Workbook()
     sheet = wb.add_sheet('Technical Questionnaire')
 
@@ -266,11 +293,10 @@ def get_questionnaire_xls(filename, doc_id, start_index=1, print_answers=True):
 
 
 def get_document_pdf(filename, doc_id, start_index=1):
-    doc = db.get(doc_id)
+    doc = get_doc_copy_with_references(doc_id, start_index=1)
     story = [Spacer(1,10*cm)]
     if doc.get('intro', None):
         story.append(P(doc['intro_header'] or 'Scope of the invitation to Tender',styleH1))
-        import copy
         styleP = copy.deepcopy(styleN)
         styleP.firstLineIndent=20
         styleP.alignment = TA_JUSTIFY
@@ -378,7 +404,7 @@ import os
 def get_document_docx(filename, doc_id, start_index=1):
     """filename is a file like object (like an HttpResponse)"""
     
-    doc=db.get(doc_id)
+    doc = get_doc_copy_with_references(doc_id, start_index=1)
     
     H1 = partial(docx.heading,headinglevel=1)
     H2 = partial(docx.heading,headinglevel=2)
