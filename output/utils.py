@@ -122,9 +122,10 @@ def get_doc_copy_with_references(doc_id, start_index=1, qproperties=['question',
                 ### Replacements in question['question'] and question['tech_spec']
                 for prop in qproperties:
                     p = question[prop]
-                    match = reference_pattern.search(p)
+                    match = reference_pattern.search(question[prop])
                     while match:
                         question[prop]= p[0:match.start()] + references[match.group('category')][match.group('tag')] + p[match.end():]
+                        p = question[prop]
                         match = reference_pattern.search(p)
     return doc
 
