@@ -12,3 +12,7 @@ Thumbs.db
 # Other misc files #
 ####################
 runserver.sh
+
+# Pycharm #
+###########
+.idea/
