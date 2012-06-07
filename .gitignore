@@ -15,4 +15,6 @@ runserver.sh
 
 # Pycharm #
 ###########
+.idea
+.idea/
 .idea/**
