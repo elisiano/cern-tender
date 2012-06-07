@@ -174,7 +174,7 @@ def _get_xls_formula(question, answer_cell_reference):
                                               answer_cell_reference, question['max_'])
         return xlwt.Formula(formula)
 
-    elif questio['doc_type'] == 'QuestionFreeText':
+    elif question['doc_type'] == 'QuestionFreeText':
         formula = 'IF(%s="",FALSE,TRUE)' % answer_cell_reference
         return xlwt.Formula(formula)
 
