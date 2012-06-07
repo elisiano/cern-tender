@@ -15,11 +15,4 @@ runserver.sh
 
 # Pycharm #
 ###########
-.idea/
-.idea/encodings.xml
-.idea/inspectionProfiles/profiles_settings.xml
-.idea/misc.xml
-.idea/modules.xml
-.idea/scopes/scope_settings.xml
-.idea/tender.iml
-.idea/vcs.xml
+.idea/**
