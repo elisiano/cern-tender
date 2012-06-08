@@ -287,7 +287,7 @@ def get_questionnaire_xls(filename, doc_id, start_index=1, print_answers=True):
 
     sheet.col(col).width = 2000
     sheet.col(col+1).width = 20000
-    sheet.col(col+2).width = 7500
+    sheet.col(col+2).width = 8000
     sheet.row_default_height = 510
 
     wb.save(filename)
@@ -361,34 +361,37 @@ def get_document_pdf(filename, doc_id, start_index=1):
 
                 story.append(NL1(question['tech_spec'], bulletText=bt))
 
-    contacts_per_row=3
-    _cs = copy.deepcopy(doc['contacts'])
-    table_data = []
-    # let's pad the table
-    while len(_cs) % contacts_per_row != 0:
-        _cs.append(dict({u'type_':'', u'name':'', u'address':'',u'tel':'',u'fax':'', u'email':''}))
-    stack = []
-    for ci in range(len(_cs)):
-        stack.append(_cs[ci])
-        if len(stack) == contacts_per_row:
-            table_data.append([ u'']       + [c['type_']+':' if c['type_'] else '' for c in stack])
-            table_data.append([u'Name']    + [c['name'] for c in stack])
-            table_data.append([u'Address'] + [c['address'].replace('\r','') for c in stack])
-            table_data.append([u'Tel']     + [c['tel'] for c in stack])
-            table_data.append([u'Fax']     + [c['fax'] for c in stack])
-            table_data.append([u'E-mail']  + [c['email'] for c in stack])
-            table_data.append([u'']*(contacts_per_row+1))
-            stack=[]
 
-    table_style=TableStyle([('VALIGN',(0,0), (-1,-1), 'TOP'),
-                            ('ALIGN', (0,0), (0,-1), 'LEFT'),
-                            ('ALIGN', (0,0), (0,-1), 'RIGHT'),
-                            #('GRID',(0,0), (-1,-1), 0.25, colors.black)
-                        ])
-    table=Table(table_data, colWidths=[2.5*cm]+[4.5*cm]*contacts_per_row, style=table_style)
-    story.append(Spacer(1,cm))
-    story.append(H1('Contacts'))
-    story.append(table)
+
+    if doc.get('contacts', None):
+        contacts_per_row=3
+        _cs = copy.deepcopy(doc.get('contacts',[]))
+        table_data = []
+        # let's pad the table
+        while len(_cs) % contacts_per_row != 0:
+            _cs.append(dict({u'type_':'', u'name':'', u'address':'',u'tel':'',u'fax':'', u'email':''}))
+        stack = []
+        for ci in range(len(_cs)):
+            stack.append(_cs[ci])
+            if len(stack) == contacts_per_row:
+                table_data.append([ u'']       + [c['type_']+':' if c['type_'] else '' for c in stack])
+                table_data.append([u'Name']    + [c['name'] for c in stack])
+                table_data.append([u'Address'] + [c['address'].replace('\r','') for c in stack])
+                table_data.append([u'Tel']     + [c['tel'] for c in stack])
+                table_data.append([u'Fax']     + [c['fax'] for c in stack])
+                table_data.append([u'E-mail']  + [c['email'] for c in stack])
+                table_data.append([u'']*(contacts_per_row+1))
+                stack=[]
+
+        table_style=TableStyle([('VALIGN',(0,0), (-1,-1), 'TOP'),
+                                ('ALIGN', (0,0), (0,-1), 'LEFT'),
+                                ('ALIGN', (0,0), (0,-1), 'RIGHT'),
+                                #('GRID',(0,0), (-1,-1), 0.25, colors.black)
+                            ])
+        table=Table(table_data, colWidths=[2.5*cm]+[4.5*cm]*contacts_per_row, style=table_style)
+        story.append(Spacer(1,cm))
+        story.append(H1('Contacts'))
+        story.append(table)
 
 
     pdf = SimpleDocTemplate(filename)
@@ -467,28 +470,31 @@ def get_document_docx(filename, doc_id, start_index=1):
                 bt = "%d.%d.%d" % (start_index + sys, sec+1, q+1)
 
                 story.append(N('\t%s. %s' % (bt, question['tech_spec'])))
-                
-    contacts_per_row=3
-    _cs = copy.deepcopy(doc['contacts'])
-    table_data = []
-    # let's pad the table
-    while len(_cs) % contacts_per_row != 0:
-        _cs.append(dict({u'type_':'', u'name':'', u'address':'',u'tel':'',u'fax':'', u'email':''}))
-    stack = []
-    for ci in range(len(_cs)):
-        stack.append(_cs[ci])
-        if len(stack) == contacts_per_row:
-            table_data.append([ u'']       + [c['type_']+':' if c['type_'] else '' for c in stack])
-            table_data.append([u'Name']    + [c['name'] for c in stack])
-            table_data.append([u'Address'] + [c['address'].replace('\r','') for c in stack])
-            table_data.append([u'Tel']     + [c['tel'] for c in stack])
-            table_data.append([u'Fax']     + [c['fax'] for c in stack])
-            table_data.append([u'E-mail']  + [c['email'] for c in stack])
-            table_data.append([u'']*(contacts_per_row+1))
-            stack=[]
-    story.append(N(''))
-    story.append(docx.table(table_data, heading=False))
-    
+
+
+    if doc.get('contacts', None):
+        contacts_per_row=3
+        _cs = copy.deepcopy(doc.get('contacts',[]))
+        table_data = []
+        # let's pad the table
+        while len(_cs) % contacts_per_row != 0:
+            _cs.append(dict({u'type_':'', u'name':'', u'address':'',u'tel':'',u'fax':'', u'email':''}))
+        stack = []
+        for ci in range(len(_cs)):
+            stack.append(_cs[ci])
+            if len(stack) == contacts_per_row:
+                table_data.append([ u'']       + [c['type_']+':' if c['type_'] else '' for c in stack])
+                table_data.append([u'Name']    + [c['name'] for c in stack])
+                table_data.append([u'Address'] + [c['address'].replace('\r','') for c in stack])
+                table_data.append([u'Tel']     + [c['tel'] for c in stack])
+                table_data.append([u'Fax']     + [c['fax'] for c in stack])
+                table_data.append([u'E-mail']  + [c['email'] for c in stack])
+                table_data.append([u'']*(contacts_per_row+1))
+                stack=[]
+
+        story.append(N(''))
+        story.append(docx.table(table_data, heading=False))
+
     # Create our properties, contenttypes, and other support files
     coreprops = docx.coreproperties(title='Invitation to tender %s' % doc_id,subject='IT %s Technical Specifications',creator='Eliiano Petrini',keywords=['tender','Office Open XML','Word','%s' % doc_id])
     appprops = docx.appproperties()
