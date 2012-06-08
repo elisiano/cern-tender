@@ -42,6 +42,8 @@ def clone(request, doc_id):
     if form.is_valid():
         doc = db.get(doc_id)
         doc['_id'] = form.cleaned_data['_id']
+        doc['cloned_from'] = doc_id
+        doc['cloned_from_rev'] = doc['_rev']
         del doc['_rev']
         result = db.save_doc(doc)
         if result['ok']:
