@@ -287,7 +287,8 @@ def get_questionnaire_xls(filename, doc_id, start_index=1, print_answers=True):
 
     sheet.col(col).width = 2000
     sheet.col(col+1).width = 20000
-    sheet.col(col+2).width = 8000
+    sheet.col(col+2).width = 7500
+    sheet.col(col+3).width = 2500
     sheet.row_default_height = 510
 
     wb.save(filename)
