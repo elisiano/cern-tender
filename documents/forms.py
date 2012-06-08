@@ -106,7 +106,7 @@ class EditSystemForm(forms.Form):
         _txt = ""
         for cat_k in properties:
             for tag_k in properties[cat_k]:
-                _txt += "properties['%s']['%s']\n\tCurrent value: %s\n\tDefined in question %s\n\n" % (cat_k, tag_k, properties[cat_k][tag_k]['answer'].__repr__(),properties[cat_k][tag_k]['question'].__repr__())
+                _txt += "properties['%s']['%s']\n\tCurrent value: %s\n\tDefined in question: %s\n\n" % (cat_k, tag_k, properties[cat_k][tag_k]['answer'].__repr__(),properties[cat_k][tag_k]['question'])
         _txt = _txt.replace('\n','\n%s' % indent)
         help_text = """<pre>
     Currently Defined Properties:
