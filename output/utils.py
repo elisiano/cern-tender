@@ -23,8 +23,10 @@ import pprint
 pp = pprint.PrettyPrinter(indent=4)
 #db = couchdbkit.ext.django.loading.get_db('documents')
 ### since this module could be used also out of django (for future command line tools)
-### I won't use any django specific functionalities
-server_uri = "http://procdev14.cern.ch:5985"
+### I won't use any django specific functionalities, but I will refer to the project settings
+# server_uri = "http://procdev14.cern.ch:5985"
+from tender import settings
+server_uri = "http://" + filter(lambda x: x[0] =='tender.documents', settings.COUCHDB_DATABASES)[0][1].split('/')[2]
 
 db = couchdbkit.client.Server(server_uri).get_db('documents')
 
