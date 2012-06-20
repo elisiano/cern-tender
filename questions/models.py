@@ -90,4 +90,4 @@ class QuestionFloatRange(QuestionRangeTemplate):
 
 
 class QuestionFreeText(QuestionTemplate):
-        answer = StringProperty()  # not used?
+        answer = StringProperty()
