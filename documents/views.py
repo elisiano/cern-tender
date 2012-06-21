@@ -265,7 +265,7 @@ def edit_system(request, system_idx, doc_id):
     if request.POST:
         form = forms.EditSystemForm(request.POST, auto_id=False)
         if form.is_valid():
-            pp.pprint(form.cleaned_data)
+            #pp.pprint(form.cleaned_data)
             ### Must convert back the system structure
             new_sections = []
             for section_idx in range(len(system.get('sections', []))):
@@ -445,11 +445,33 @@ def edit_system_section_question(request, question_idx, section_idx, system_idx,
     doc = db.get(doc_id)
 
     question = doc['systems'][sys]['sections'][sec]['questions'][qid]
+    
+    # used to check the question validity in the form (i.e. no duplicates) when modifying the question itself
+    question['from_doc'] = doc_id 
+    question['from_sys'] = sys
+    question['from_sec'] = sec
+    question['from_qid'] = qid
 
     if request.POST:
-        form = forms.EditSystemSectionQuestionForm(request.POST, auto_id=True)
-        if form.is_valid():
+        # now the we remove the previously added fields
+        data = dict(request.POST)
+        data['from_doc'] = doc_id 
+        data['from_sys'] = sys
+        data['from_sec'] = sec
+        data['from_qid'] = qid
 
+        form = forms.EditSystemSectionQuestionForm(data, auto_id=True)
+        
+        if form.is_valid():
+            pp.pprint(form.cleaned_data)
+            try:
+                del data['from_doc']
+                del data['from_sys']
+                del data['from_sec']
+                del data['from_qid']
+            except Exception:
+                pass
+            
             question = form.cleaned_data
             if question['doc_type'] == 'QuestionFromList':
                 i = 1
@@ -472,7 +494,8 @@ def edit_system_section_question(request, question_idx, section_idx, system_idx,
                 question['answer_%d' % _t[0]] = _t[1]
                 question['tech_spec_%d' % _t[0]] = question['answer_data'][_t[1]]
             del question['answer_data']
-        form = forms.EditSystemSectionQuestionForm(question, auto_id=True)
+            
+        form = forms.EditSystemSectionQuestionForm(initial=question, auto_id=True)
 
     return render_to_response('documents/edit_system_section_question.html',
                              {'form': form, 'question': question},

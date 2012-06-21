@@ -178,7 +178,8 @@ class AddSystemSectionQuestionForm(forms.Form):
 
 
 class EditSystemSectionQuestionForm(forms.Form):
-    question = forms.CharField(widget=forms.TextInput(attrs={'readonly': 'readonly'}))
+    #question = forms.CharField(widget=forms.TextInput(attrs={'readonly': 'readonly'}))
+    question = forms.CharField(widget=forms.TextInput())
     answer = forms.CharField(required=False)
     category = forms.CharField()
     tag = forms.CharField()
@@ -188,19 +189,42 @@ class EditSystemSectionQuestionForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super(EditSystemSectionQuestionForm, self).__init__(*args, **kwargs)
 
-        data = args[0]
+        if kwargs.get('initial'):
+            self.data = kwargs['initial']
+        else:
+            self.data = args[0]
 
         # Duck Typing: if some known fields are present they will be added to the form
         ### First Case: QuestionFromList
         i = 1
-        while data.get('answer_%d' % i, None):
+        while self.data.get('answer_%d' % i, None):
             self.fields['answer_%d' % i] = forms.CharField()
             self.fields['tech_spec_%d' % i] = forms.CharField()
             i+=1
         ### For range types there are min_, max_ and ts_formatter
         for f in [('min_', None), ('max_', None), ('ts_formatter', 'Tech Spec Formatter')]:
-            if data.get(f[0], None) or type(data.get(f[0], None)) in [int, float]:
+            if self.data.get(f[0], None) or type(self.data.get(f[0], None)) in [int, float]:
                 self.fields[f[0]] = forms.CharField(label=f[1])
 
+    def clean_question(self):
+            db = couchdbkit.ext.django.loading.get_db('documents')
+            doc = db.get(self.data['from_doc'])
+            section = doc['systems'][int(self.data['from_sys'])]['sections'][int(self.data['from_sec'])]
+            section['questions'].pop(int(self.data['from_qid']))
 
+            for q in section['questions']:
+                print "%s == %s ? %s" % (q['question'], self.cleaned_data['question'], q['question'] == self.cleaned_data['question'])
+                if q['question'].strip() == self.cleaned_data['question'][3:-2].strip():
+                    raise forms.ValidationError('Question already present in the section')
+                
+            return self.cleaned_data['question']
+
+    # due to a nasty bug somewhere I need to clean the cleaned_data dictionary
+    # if the previous method (clean_question) is removed, this is not necessary
+    def clean(self):
+        data = {}
+        for field in self.cleaned_data:
+            data[field] = self.cleaned_data[field][3:-2].strip()
+        
+        return data
 
