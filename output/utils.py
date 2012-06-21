@@ -105,12 +105,12 @@ def get_category_tag_index(doc_id, start_index=1):
 def get_doc_copy_with_references(doc_id, start_index=1, qproperties=['question', 'tech_spec']):
     """
     Returns a copy of the document with the references substituted
-    It checks each question of the document. If the properties (found in @qproperties) match the pattern {% category.tag %}
+    It checks each question of the document. If the properties (found in @qproperties) match the pattern {# category.tag #}
     then the value of the pattern is substituted with the proper reference number
 
     WARNING: if multiple questions with the same category/tag are defined, all the references will point to the last definition
     """
-    reference_pattern = re.compile(r'\{\%\s*(?P<category>.*?)\.(?P<tag>[^%\s]*?)\s*\%\}')
+    reference_pattern = re.compile(r'\{\#\s*(?P<category>.*?)\.(?P<tag>[^%\s]*?)\s*\#\}')
     references = get_category_tag_index(doc_id, start_index)
     doc = db.get(doc_id)
 
