@@ -47,7 +47,7 @@ def clone(request, doc_id):
         del doc['_rev']
         result = db.save_doc(doc)
         if result['ok']:
-            ahref= reverse('documents.views.view', args=(doc_id,))
+            ahref= reverse('documents.views.view', args=(result['id'],))
 
             return message('Document Saved',
                            'The document <a href="%s">%s</a> has been saved' % (ahref, result['id']))
