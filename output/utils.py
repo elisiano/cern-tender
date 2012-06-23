@@ -496,7 +496,8 @@ def get_document_docx(filename, doc_id, start_index=1):
                 table_data.append([u'']*(contacts_per_row+1))
                 stack=[]
 
-        story.append(N(''))
+        story.append(docx.pagebreak())
+        story.append(H1('Contacts'))
         story.append(docx.table(table_data, heading=False))
 
     # Create our properties, contenttypes, and other support files
