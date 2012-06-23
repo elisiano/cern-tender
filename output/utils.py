@@ -392,7 +392,8 @@ def get_document_pdf(filename, doc_id, start_index=1):
                                 #('GRID',(0,0), (-1,-1), 0.25, colors.black)
                             ])
         table=Table(table_data, colWidths=[2.5*cm]+[4.5*cm]*contacts_per_row, style=table_style)
-        story.append(Spacer(1,cm))
+        #story.append(Spacer(1,cm)) 
+        story.append(PageBreak()) # as requested now there is a PageBreak before the Contacts
         story.append(H1('Contacts'))
         story.append(table)
 
