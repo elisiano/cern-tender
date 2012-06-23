@@ -499,7 +499,7 @@ def get_document_docx(filename, doc_id, start_index=1):
         story.append(docx.table(table_data, heading=False))
 
     # Create our properties, contenttypes, and other support files
-    coreprops = docx.coreproperties(title='Invitation to tender %s' % doc_id,subject='IT %s Technical Specifications',creator='Eliiano Petrini',keywords=['tender','Office Open XML','Word','%s' % doc_id])
+    coreprops = docx.coreproperties(title='Invitation to tender %s' % doc_id,subject='IT %s Technical Specifications',creator='Elisiano Petrini',keywords=['tender','Office Open XML','Word','%s' % doc_id])
     appprops = docx.appproperties()
     contenttypes = docx.contenttypes()
     websettings = docx.websettings()
