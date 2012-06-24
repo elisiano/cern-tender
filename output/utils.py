@@ -194,8 +194,6 @@ def get_questionnaire_pdf(filename, doc_id, start_index=1, print_answers=True):
     story.append(table)
 
     pdf = SimpleDocTemplate(filename)
-    #title="Very very very very very long title which probably will not fit in one line and the behaviour is not known"
-    #title="Short title"
     _on_first_page = partial(_first_page, doc_id=doc_id, title=doc['title'], type_="Technical Questionnaire")
     _on_later_pages = partial(_later_pages, doc_id=doc_id, type_="Technical Questionnaire")
     pdf.build(story, onFirstPage=_on_first_page, onLaterPages=_on_later_pages)
@@ -206,13 +204,12 @@ def get_questionnaire_pdf(filename, doc_id, start_index=1, print_answers=True):
 import xlwt
 def _get_xls_formula(question, answer_cell_reference):
     if question['doc_type'] == 'QuestionFromList':
-        formula="IF(OR("
+        formula="OR("
         tmp_conds=[]
         for k in question['answer_data']:
-#            tmp_conds.append('CELL("contents",%s)=="%s"' % (answer_cell_reference, k))
             tmp_conds.append('%s="%s"' % (answer_cell_reference, k))
         formula += ','.join(tmp_conds)
-        formula += "),TRUE,FALSE)"
+        formula += ")"
         return xlwt.Formula(formula)
     elif question['doc_type'].find('Range') > -1:
         formula="AND(%s >= %s, %s <= %s)" % ( answer_cell_reference, question['min_'],
