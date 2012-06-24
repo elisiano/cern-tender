@@ -130,6 +130,7 @@ INSTALLED_APPS = (
     'questions',
     'documents',
     'questionnaire',
+    'output',
 )
 
 # A sample logging configuration. The only tangible logging
